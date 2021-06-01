@@ -1,5 +1,6 @@
 using CamundaInsurance.Areas.Identity;
 using CamundaInsurance.Data;
+using CamundaInsurance.Data.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -31,16 +32,23 @@ namespace CamundaInsurance
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            ConfigureDB(services);
+            services.AddDefaultIdentity<User>().AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
             services.AddDatabaseDeveloperPageExceptionFilter();
-            services.AddSingleton<WeatherForecastService>();
+            
+        }
+
+        private void ConfigureDB(IServiceCollection services)
+        {
+            var host = Environment.GetEnvironmentVariable("DB_HOST");
+            var port = Environment.GetEnvironmentVariable("DB_PORT");
+            var user = Environment.GetEnvironmentVariable("DB_USERNAME");
+            var password = Environment.GetEnvironmentVariable("DB_PASSWORD");                    
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseNpgsql($"Host={host};Port={port};Database=webapp;Username={user};Password={password}"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

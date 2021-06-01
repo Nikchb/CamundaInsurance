@@ -1,0 +1,31 @@
+﻿@inherits AuthorizedComponentBase
+
+<div class="row">
+    <div class="col-6">
+        <div class="form-group">
+            <label>Name</label>
+            <input type="text" @bind="CurrentUser.Name" disabled />
+        </div>
+        <div class="form-group">
+            <label>Surname</label>
+            <input type="text" @bind="CurrentUser.SurName" disabled />
+        </div>
+        <div class="form-group">
+            <label>Birth Date</label>
+            <input type="date" @bind="CurrentUser.BirthDay" disabled />
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" @bind="CurrentUser.Email" disabled />
+        </div>
+        @if (CurrentUser.InsuranceCardNumber != null)
+        {
+            <div class="form-group">
+                <label>Surname</label>
+                <input type="text" @bind="CurrentUser.InsuranceCardNumber" disabled />
+            </div>
+        }
+    </div>
+</div>
