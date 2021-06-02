@@ -1,0 +1,35 @@
+﻿<ul class="alert-danger">
+    @foreach (var error in Errors)
+    {
+        <li>@error</li>
+    }
+</ul>
+
+<div>
+    <div class="form-group">
+        <label>Insurance Type</label>
+        <select class="form-control" @bind="Model.InsuranceType">
+            <option value="Basic">Basic</option>
+            <option value="Premium">Premium</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Height</label>
+        <input class="form-control" type="number" @bind="Model.Height" />
+    </div>
+    <div class="form-group">
+        <label>Weight</label>
+        <input class="form-control" type="number" @bind="Model.Weight" />
+    </div>
+    <div class="form-group">
+        <label>Pre-existing diseases level</label>
+        <select class="form-control" @bind="Model.HealthHistoryRisk">
+            <option value="0">None</option>
+            <option value="1">Light</option>
+            <option value="2">Medium</option>
+            <option value="3">Critical</option>
+        </select>
+    </div>
+    <button @onclick="SendRequest" class="form-control btn-primary">Send Insurance Request</button>
+</div>
+

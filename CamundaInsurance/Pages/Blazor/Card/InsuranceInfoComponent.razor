@@ -1,0 +1,69 @@
+﻿@using CamundaInsurance.Data.Models
+@if(Info != null)
+{
+    <div class="row">
+        <div class="col-5">
+            @if (Info.Status == InsuranceRequestStatus.None)
+            {
+                <div class="form-group">
+                    <label>Insurance Status</label>
+                    <button class="form-control btn-danger" disabled>Not Insured</button>
+                </div>
+            }
+            @if (Info.Status == InsuranceRequestStatus.Approved)
+            {
+                <div class="form-group">
+                    <label>Insurance Status</label>
+                    <button class="form-control btn-success" disabled>Insured</button>
+                </div>
+                <div class="form-group">
+                    <label>Insurance Type</label>
+                    <input @bind="Info.InsuranceType" type="text" class="form-control" readonly />
+                </div>
+                <div class="form-group">
+                    <label>Insurance Cost</label>
+                    <input @bind="Info.Cost" type="number" class="form-control" readonly />
+                </div>
+                @if (Info.CanDeactivate)
+                {
+                    <div class="form-group">
+                        <label>Insurance can be deactivated till @Info.DeactivationDeadline.ToString("dd.MM.YYYY")</label>
+                        <NavLink>Deactivate Incurance</NavLink>
+                    </div>
+                }
+            }
+            @if (Info.Status == InsuranceRequestStatus.InProcess)
+            {
+                <div class="form-group">
+                    <label>Insurance Status</label>
+                    <button class="form-control btn-info" disabled>Request In Process</button>
+                </div>
+                <div class="form-group">
+                    <label>Insurance Type</label>
+                    <input @bind="Info.InsuranceType" type="text" class="form-control" readonly />
+                </div>
+            }
+            @if (Info.Status == InsuranceRequestStatus.Denied)
+            {
+                <div class="form-group">
+                    <label>Insurance Status</label>
+                    <button class="form-control btn-info" disabled>Not Insured</button>
+                </div>
+                <div class="form-group">
+                    <label>Insurance Type</label>
+                    <input @bind="Info.InsuranceType" type="text" class="form-control" readonly />
+                </div>
+                <div class="form-group">
+                    <label>Renouncement reason</label>
+                    <input @bind="Info.Reason" type="text" multiple class="form-control" readonly />
+                </div>
+            }
+        </div>
+        @if (Info.Status == InsuranceRequestStatus.Denied || Info.Status == InsuranceRequestStatus.None)
+        {
+            <div class="col-7">
+                <InsuranceRequestComponent ParentComponent="this"/>
+            </div>
+        }
+    </div>
+}

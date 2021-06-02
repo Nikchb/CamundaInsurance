@@ -1,6 +1,6 @@
-using CamundaInsurance.Areas.Identity;
 using CamundaInsurance.Data;
 using CamundaInsurance.Data.Models;
+using CamundaInsurance.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -33,27 +33,32 @@ namespace CamundaInsurance
         public void ConfigureServices(IServiceCollection services)
         {
             ConfigureDB(services);
-            services.AddDefaultIdentity<User>().AddEntityFrameworkStores<ApplicationDbContext>();
+            services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
+            services.AddTransient<IdentityService>();
+            services.AddTransient<InsuranceManager>();
             services.AddDatabaseDeveloperPageExceptionFilter();
             
         }
 
         private void ConfigureDB(IServiceCollection services)
         {
-            var host = Environment.GetEnvironmentVariable("DB_HOST");
-            var port = Environment.GetEnvironmentVariable("DB_PORT");
-            var user = Environment.GetEnvironmentVariable("DB_USERNAME");
-            var password = Environment.GetEnvironmentVariable("DB_PASSWORD");                    
+            var host = Environment.GetEnvironmentVariable("DB_HOST") ?? "localhost";
+            var port = Environment.GetEnvironmentVariable("DB_PORT") ?? "5432";
+            var user = Environment.GetEnvironmentVariable("DB_USERNAME") ?? "camunda";
+            var password = Environment.GetEnvironmentVariable("DB_PASSWORD") ?? "camunda";                    
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseNpgsql($"Host={host};Port={port};Database=webapp;Username={user};Password={password}"));
+                options.UseNpgsql($"Host={host};Port={port};Database=webapp;Username={user};Password={password}"),
+                ServiceLifetime.Transient);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ApplicationDbContext context)
         {
+            context.Database.Migrate();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -78,7 +83,7 @@ namespace CamundaInsurance
             {
                 endpoints.MapControllers();
                 endpoints.MapBlazorHub();
-                endpoints.MapFallbackToPage("/_Host");
+                endpoints.MapFallbackToPage("/Blazor/Shared/_Host");
             });
         }
     }
