@@ -1,0 +1,22 @@
+﻿@page "/card/revoke"
+<h3>Do you want to revoke your insurance?</h3>
+
+<br />
+<br />
+<ul class="alert-danger">
+    @foreach (var error in Errors)
+    {
+        <li>@error</li>
+    }
+</ul>
+<div class="row">
+    <div class="col-2" />
+    <div class="col-3">
+        <button @onclick="Revoke" class="form-control btn-danger">Yes</button>
+    </div>
+    <div class="col-2" />
+    <div class="col-3">
+        <button @onclick="No" class="form-control btn-success">No</button>
+    </div>
+    <div class="col-2" />
+</div>

@@ -12,7 +12,7 @@ namespace CamundaInsurance.Services.Insurance.Models
         public decimal Cost { get; set; }
         public string Reason { get; set; }
         public DateTime ApprovalTime { get; set; }
-        public bool CanDeactivate => DateTime.Now.Date > DeactivationDeadline;
+        public bool CanDeactivate => DateTime.Now.Date < DeactivationDeadline;
         public DateTime DeactivationDeadline => ApprovalTime.Date.Date + TimeSpan.FromDays(14);
     }
 }

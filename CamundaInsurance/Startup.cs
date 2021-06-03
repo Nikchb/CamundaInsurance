@@ -1,6 +1,7 @@
 using CamundaInsurance.Data;
 using CamundaInsurance.Data.Models;
 using CamundaInsurance.Services;
+using CamundaInsurance.Services.Insurance;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -71,7 +72,6 @@ namespace CamundaInsurance
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();

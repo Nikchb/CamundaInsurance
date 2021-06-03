@@ -114,12 +114,42 @@ namespace CamundaInsurance.Services.Insurance
             insuranceRequest.Status = model.Status;
             insuranceRequest.Cost = model.Cost;
             insuranceRequest.Reason = model.Reason;
+            insuranceRequest.ApprovalTime = DateTime.Now;
 
             await context.SaveChangesAsync();
 
             return Ok();
         }
 
-        //public async Task<SResponce> Re
+        public async Task<SResponce> RevokeInsurance()
+        {
+            var identityResponce = await identityService.GetCurrentUserAsync();
+            if (identityResponce.Succeeded == false)
+            {
+                return Error(identityResponce.Messages);
+            }
+            var user = identityResponce.Content;
+
+            var request = context.InsuranceRequests
+                .Where(v => v.UserId == user.Id && v.Status == InsuranceRequestStatus.Approved)
+                .OrderBy(v => v.CreationTime)
+                .LastOrDefault();
+            if (request == null)
+            {
+                return Error("No active insurance found");
+            }
+
+            if(DateTime.Now.Date - request.ApprovalTime.Date > TimeSpan.FromDays(14))
+            {
+                return Error("Insurance can not be revoked after 14 days");
+            }
+
+            request.Status = InsuranceRequestStatus.Denied;
+            request.Reason = "Insurance is revoked by the user";
+
+            await context.SaveChangesAsync();
+
+            return Ok();
+        }
     }
 }

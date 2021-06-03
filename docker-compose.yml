@@ -37,7 +37,12 @@ services:
         volumes:
             - ./data:/var/lib/postgresql/data/  
         ports:
-            - "5432:5432"    
+            - "5432:5432"
+    adminer:
+        image: adminer
+        restart: always
+        ports:
+            - 8090:8080    
 networks:
     default:
         driver: bridge
