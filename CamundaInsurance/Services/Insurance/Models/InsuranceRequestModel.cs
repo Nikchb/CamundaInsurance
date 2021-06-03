@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace CamundaInsurance.Models
+namespace CamundaInsurance.Services.Insurance.Models
 {
     public class InsuranceRequestModel
     {

@@ -1,6 +1,5 @@
-﻿using CamundaInsurance.Models;
-using CamundaInsurance.Pages.Blazor.Interfaces;
-using CamundaInsurance.Services;
+﻿using CamundaInsurance.Services.Insurance;
+using CamundaInsurance.Services.Insurance.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using System;
@@ -8,20 +7,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace CamundaInsurance.Pages.Blazor.Card
+namespace CamundaInsurance.Pages.Blazor.Card.Components
 {
     [Authorize]
-    public partial class InsuranceInfoComponent : INotifiableComponent
-    {
+    public partial class InsuranceInfoComponent
+    { 
         [Inject]
         private InsuranceManager InsuranceManager { get; set; }
 
         private InsuranceInfoModel Info { get; set; }
-
-        public void Notify()
-        {
-            StateHasChanged();            
-        }
 
         protected async override Task OnParametersSetAsync()
         {

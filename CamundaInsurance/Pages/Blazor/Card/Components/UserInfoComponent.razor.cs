@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace CamundaInsurance.Pages.Blazor.Card
+namespace CamundaInsurance.Pages.Blazor.Card.Components
 {
     [Authorize]
     public partial class UserInfoComponent
@@ -18,9 +18,19 @@ namespace CamundaInsurance.Pages.Blazor.Card
 
         private User CurrentUser { get; set; }
 
+        private List<string> Errors { get; set; } = new List<string>();
+
         protected async override Task OnParametersSetAsync()
         {
-            CurrentUser = await IdentityService.GetCurrentUserAsync();
+            var identityResponce = await IdentityService.GetCurrentUserAsync();
+            if (identityResponce.Succeeded)
+            {
+                CurrentUser = identityResponce.Content;
+            }
+            else
+            {
+                Errors.AddRange(identityResponce.Messages);
+            }                 
             await base.OnParametersSetAsync();
         }
     }

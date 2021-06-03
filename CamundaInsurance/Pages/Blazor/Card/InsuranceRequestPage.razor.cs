@@ -1,27 +1,20 @@
-﻿using CamundaInsurance.Data;
-using CamundaInsurance.Models;
-using CamundaInsurance.Pages.Blazor.Interfaces;
-using CamundaInsurance.Services;
+﻿using CamundaInsurance.Services.Insurance.Models
+using CamundaInsurance.Services.Insurance;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace CamundaInsurance.Pages.Blazor.Card
 {
     [Authorize]
-    public partial class InsuranceRequestComponent
+    public partial class InsuranceRequestPage
     {
         [Inject]
         private InsuranceManager InsuranceManager { get; set; }
 
         [Inject]
-        private NavigationManager NavigationManager { get; set; }
-
-        [Parameter]
-        public INotifiableComponent ParentComponent { get; set; }
+        private NavigationManager NavigationManager { get; set; }       
 
         private InsuranceRequestModel Model { get; set; } = new InsuranceRequestModel();
 
@@ -31,11 +24,12 @@ namespace CamundaInsurance.Pages.Blazor.Card
         {
             Errors.Clear();
             var responce = await InsuranceManager.SendInsuranceRequest(Model);
-            if(responce.Succeeded == false)
+            if(responce.Succeeded)
             {
-                Errors.AddRange(responce.Messages);
+                NavigationManager.NavigateTo("/card");
+                return;
             }
-            ParentComponent.Notify();
+            Errors.AddRange(responce.Messages);
         }
     }
 }

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace CamundaInsurance.Services
 {
-    public class IdentityService
+    public class IdentityService : ServiceBase
     {
         private readonly AuthenticationStateProvider authenticationStateProvider;
         private readonly ApplicationDbContext context;
@@ -26,19 +26,19 @@ namespace CamundaInsurance.Services
             return (await authenticationStateProvider.GetAuthenticationStateAsync()).User.Identity.IsAuthenticated;
         }
 
-        public async Task<User> GetCurrentUserAsync()
+        public async Task<SContentResponce<User>> GetCurrentUserAsync()
         {
             var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
             if (authState.User.Identity.IsAuthenticated == false)
             {
-                throw new Exception("User is not authenticated");
+                return Error<User>("User is not authenticated");
             }
             var user = await context.Users.FirstOrDefaultAsync(v=>v.UserName == authState.User.Identity.Name);
             if(user == null)
             {
-                throw new Exception("User is not found");
+                return Error<User>("User is not found");             
             }
-            return user;
+            return Ok(user);
         }
     }
 }

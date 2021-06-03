@@ -2,7 +2,7 @@
 @if(Info != null)
 {
     <div class="row">
-        <div class="col-5">
+        <div class="col-6">
             @if (Info.Status == InsuranceRequestStatus.None)
             {
                 <div class="form-group">
@@ -61,8 +61,8 @@
         </div>
         @if (Info.Status == InsuranceRequestStatus.Denied || Info.Status == InsuranceRequestStatus.None)
         {
-            <div class="col-7">
-                <InsuranceRequestComponent ParentComponent="this"/>
+            <div class="col-6">
+                <NavLink href="/card/new-request"> >Request Insurance</NavLink>
             </div>
         }
     </div>

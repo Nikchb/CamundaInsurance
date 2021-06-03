@@ -1,6 +1,6 @@
 ﻿using CamundaInsurance.Data;
 using CamundaInsurance.Data.Models;
-using CamundaInsurance.Models;
+using CamundaInsurance.Services.Insurance.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using System;
@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace CamundaInsurance.Services
+namespace CamundaInsurance.Services.Insurance
 {
     public class InsuranceManager : ServiceBase
     {
@@ -24,8 +24,14 @@ namespace CamundaInsurance.Services
 
         public async Task<SContentResponce<InsuranceInfoModel>> GetInsuranceInfoAsync()
         {
-            var currentUser = await identityService.GetCurrentUserAsync();
-            var userRequest = context.InsuranceRequests.Where(v => v.UserId == currentUser.Id);
+            var identityResponce = await identityService.GetCurrentUserAsync();
+            if (identityResponce.Succeeded == false)
+            {
+                return Error<InsuranceInfoModel>(identityResponce.Messages);
+            }
+            var user = identityResponce.Content;
+
+            var userRequest = context.InsuranceRequests.Where(v => v.UserId == user.Id);
             if(userRequest.Count() == 0)
             {
                 return Ok(new InsuranceInfoModel
@@ -52,7 +58,22 @@ namespace CamundaInsurance.Services
                 return Error(result.Select(v=>v.ErrorMessage).ToArray());
             }
 
-            var user = await identityService.GetCurrentUserAsync();            
+            var identityResponce = await identityService.GetCurrentUserAsync();
+            if(identityResponce.Succeeded == false)
+            {
+                return Error(identityResponce.Messages);
+            }
+            var user = identityResponce.Content;
+
+            if (context.InsuranceRequests.Where(v=>v.UserId == user.Id).Any(v=>v.Status == InsuranceRequestStatus.Approved))
+            {
+                return Error("Insurance is already approved, deactivate old insurance before requestung new one");
+            }
+
+            if (context.InsuranceRequests.Where(v => v.UserId == user.Id).Any(v => v.Status == InsuranceRequestStatus.InProcess))
+            {
+                return Error("Insurance request is already in process, please wait for the result");
+            }
 
             var insuranceRequest = new InsuranceRequest 
             {
@@ -75,5 +96,30 @@ namespace CamundaInsurance.Services
             await context.SaveChangesAsync();
             return Ok();
         }
+
+        public async Task<SResponce> HandleInsuranceResponce(InsuranceResponceModel model)
+        {
+            var result = Tools.ValidateModel(model);
+            if (result != null)
+            {
+                return Error(result.Select(v => v.ErrorMessage).ToArray());
+            }
+
+            var insuranceRequest = await context.InsuranceRequests.FindAsync(model.Id);
+            if(insuranceRequest == null)
+            {
+                return Error("Insurance request not found");
+            }
+
+            insuranceRequest.Status = model.Status;
+            insuranceRequest.Cost = model.Cost;
+            insuranceRequest.Reason = model.Reason;
+
+            await context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        //public async Task<SResponce> Re
     }
 }
