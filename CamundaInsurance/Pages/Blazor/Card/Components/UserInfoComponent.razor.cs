@@ -22,6 +22,7 @@ namespace CamundaInsurance.Pages.Blazor.Card.Components
 
         protected async override Task OnParametersSetAsync()
         {
+            Errors.Clear();
             var identityResponce = await IdentityService.GetCurrentUserAsync();
             if (identityResponce.Succeeded)
             {
@@ -33,5 +34,15 @@ namespace CamundaInsurance.Pages.Blazor.Card.Components
             }                 
             await base.OnParametersSetAsync();
         }
+        
+        private async Task UpdateInformation()
+        {
+            Errors.Clear();
+            var responce = await IdentityService.UpdateUserInfoAsync(CurrentUser);
+            if(responce.Succeeded == false)
+            {
+                Errors.AddRange(responce.Messages);
+            }
+        }    
     }
 }

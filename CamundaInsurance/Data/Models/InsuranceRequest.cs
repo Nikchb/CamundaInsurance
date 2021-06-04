@@ -21,7 +21,10 @@ namespace CamundaInsurance.Data.Models
         #region Request
 
         [Required]
-        public string InsuranceType { get; set; }
+        public string Triff { get; set; }
+
+        [Required]
+        public DateTime InsuranceStartDate { get; set; }
 
         [Required]
         public short Height { get; set; }
@@ -29,14 +32,13 @@ namespace CamundaInsurance.Data.Models
         [Required]
         public short Weight { get; set; }
 
-        [Required]
-        public short HealthHistoryRisk { get; set; }
+        public string PreExistingConditions { get; set; }
 
         #endregion
 
         #region Responce
 
-        public DateTime ApprovalTime { get; set; }
+        public DateTime ApprovalDate { get; set; }
 
         public decimal Cost { get; set; }
 

@@ -10,7 +10,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CamundaInsurance.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210601222121_Initial")]
+    [Migration("20210604165757_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -26,26 +26,32 @@ namespace CamundaInsurance.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("ApprovalTime")
+                    b.Property<DateTime>("ApprovalDate")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<decimal>("Cost")
+                        .HasColumnType("numeric");
 
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<short>("HealthHistoryRisk")
-                        .HasColumnType("smallint");
-
                     b.Property<short>("Height")
                         .HasColumnType("smallint");
 
-                    b.Property<string>("InsuranceType")
-                        .IsRequired()
+                    b.Property<DateTime>("InsuranceStartDate")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("PreExistingConditions")
                         .HasColumnType("text");
 
                     b.Property<string>("Reason")
                         .HasColumnType("text");
 
                     b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Triff")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -74,6 +80,10 @@ namespace CamundaInsurance.Migrations
                     b.Property<DateTime>("BirthDay")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("text");
@@ -84,6 +94,14 @@ namespace CamundaInsurance.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean");
+
+                    b.Property<string>("Gender")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("HouseNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("InsuranceCardNumber")
                         .HasColumnType("text");
@@ -115,7 +133,16 @@ namespace CamundaInsurance.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("PostIndex")
+                        .IsRequired()
+                        .HasMaxLength(5)
+                        .HasColumnType("character varying(5)");
+
                     b.Property<string>("SecurityStamp")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Street")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("SurName")
@@ -126,6 +153,7 @@ namespace CamundaInsurance.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("UserName")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
@@ -218,12 +246,10 @@ namespace CamundaInsurance.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ProviderKey")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
+                        .HasColumnType("text");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("text");
@@ -260,12 +286,10 @@ namespace CamundaInsurance.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Value")
                         .HasColumnType("text");

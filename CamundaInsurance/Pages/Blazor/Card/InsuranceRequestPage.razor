@@ -12,10 +12,14 @@
     <div class="col-6">
         <div class="form-group">
             <label>Insurance Type</label>
-            <select class="form-control" @bind="Model.InsuranceType">
+            <select class="form-control" @bind="Model.Tariff">
                 <option value="Basic">Basic</option>
                 <option value="Premium">Premium</option>
             </select>
+        </div>
+        <div class="form-group">
+            <label>Insurance Start Date</label>
+            <input class="form-control" type="date" @bind="Model.InsuranceStartDate" />
         </div>
         <div class="form-group">
             <label>Height</label>
@@ -26,13 +30,8 @@
             <input class="form-control" type="number" @bind="Model.Weight" />
         </div>
         <div class="form-group">
-            <label>Pre-existing diseases level</label>
-            <select class="form-control" @bind="Model.HealthHistoryRisk">
-                <option value="0">None</option>
-                <option value="1">Light</option>
-                <option value="2">Medium</option>
-                <option value="3">Critical</option>
-            </select>
+            <label>Pre-existing conditions and diseases</label>
+            <textarea class="form-control" @bind="Model.PreExistingConditions" />
         </div>
         <button @onclick="SendRequest" class="form-control btn-primary">Send Insurance Request</button>
     </div>

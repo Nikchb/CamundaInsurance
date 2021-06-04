@@ -9,23 +9,45 @@
     <br />
     <h4>User information</h4>
     <div class="row">
-        <div class="form-group col-md-4">
+        <div class="form-group col-md-3">
             <label>Name</label>
             <input class="form-control" type="text" @bind="CurrentUser.Name" disabled />
         </div>
-        <div class="form-group col-md-4">
+        <div class="form-group col-md-3">
             <label>Surname</label>
             <input class="form-control" type="text" @bind="CurrentUser.SurName" disabled />
         </div>
-        <div class="form-group col-md-4">
+        <div class="form-group col-md-3">
             <label>Birth Date</label>
             <input class="form-control" type="date" @bind="CurrentUser.BirthDay" disabled />
+        </div>
+        <div class="form-group col-md-3">
+            <label>Gender</label>
+            <input class="form-control" type="text" @bind="CurrentUser.Gender" disabled />
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col-md-3">
+            <label>Post Index</label>
+            <input class="form-control" type="text" @bind="CurrentUser.PostIndex" />
+        </div>
+        <div class="form-group col-md-3">
+            <label>City</label>
+            <input class="form-control" type="text" @bind="CurrentUser.City" />
+        </div>
+        <div class="form-group col-md-3">
+            <label>Street</label>
+            <input class="form-control" type="text" @bind="CurrentUser.Street" />
+        </div>
+        <div class="form-group col-md-3">
+            <label>House Number</label>
+            <input class="form-control" type="text" @bind="CurrentUser.HouseNumber" />
         </div>
     </div>
     <div class="row">
         <div class="form-group col-md-8">
             <label>Email</label>
-            <input class="form-control" type="email" @bind="CurrentUser.Email" disabled />
+            <input class="form-control" type="email" @bind="CurrentUser.UserName" />
         </div>
         @if (CurrentUser.InsuranceCardNumber != null)
         {
@@ -35,4 +57,5 @@
             </div>
         }
     </div>
+    <button @onclick="UpdateInformation" class="btn btn-primary">Save Information</button>
 }

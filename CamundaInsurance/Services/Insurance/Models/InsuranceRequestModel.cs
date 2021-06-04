@@ -9,7 +9,7 @@ namespace CamundaInsurance.Services.Insurance.Models
     public class InsuranceRequestModel
     {
         [Required]
-        public string InsuranceType { get; set; } = "Premium";
+        public string Tariff { get; set; } = "Premium";
 
         [Required]        
         public short Height { get; set; }
@@ -18,6 +18,8 @@ namespace CamundaInsurance.Services.Insurance.Models
         public short Weight { get; set; }
 
         [Required]
-        public short HealthHistoryRisk { get; set; } = 0;
+        public DateTime InsuranceStartDate { get; set; } = DateTime.Now + TimeSpan.FromDays(7);
+        
+        public string PreExistingConditions { get; set; }
     }
 }

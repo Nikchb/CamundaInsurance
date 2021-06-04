@@ -27,11 +27,16 @@ namespace CamundaInsurance.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "text", nullable: false),
+                    UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     SurName = table.Column<string>(type: "text", nullable: false),
                     InsuranceCardNumber = table.Column<string>(type: "text", nullable: true),
                     BirthDay = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    Gender = table.Column<string>(type: "text", nullable: false),
+                    PostIndex = table.Column<string>(type: "character varying(5)", maxLength: 5, nullable: false),
+                    City = table.Column<string>(type: "text", nullable: false),
+                    Street = table.Column<string>(type: "text", nullable: false),
+                    HouseNumber = table.Column<string>(type: "text", nullable: false),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedEmail = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -97,8 +102,8 @@ namespace CamundaInsurance.Migrations
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
-                    ProviderKey = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    LoginProvider = table.Column<string>(type: "text", nullable: false),
+                    ProviderKey = table.Column<string>(type: "text", nullable: false),
                     ProviderDisplayName = table.Column<string>(type: "text", nullable: true),
                     UserId = table.Column<string>(type: "text", nullable: false)
                 },
@@ -142,8 +147,8 @@ namespace CamundaInsurance.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<string>(type: "text", nullable: false),
-                    LoginProvider = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
-                    Name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    LoginProvider = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
                     Value = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
@@ -164,12 +169,14 @@ namespace CamundaInsurance.Migrations
                     Id = table.Column<string>(type: "text", nullable: false),
                     CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: false),
-                    Reason = table.Column<string>(type: "text", nullable: true),
-                    ApprovalTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    InsuranceType = table.Column<string>(type: "text", nullable: false),
+                    Triff = table.Column<string>(type: "text", nullable: false),
+                    InsuranceStartDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     Height = table.Column<short>(type: "smallint", nullable: false),
                     Weight = table.Column<short>(type: "smallint", nullable: false),
-                    HealthHistoryRisk = table.Column<short>(type: "smallint", nullable: false),
+                    PreExistingConditions = table.Column<string>(type: "text", nullable: true),
+                    ApprovalDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    Cost = table.Column<decimal>(type: "numeric", nullable: false),
+                    Reason = table.Column<string>(type: "text", nullable: true),
                     UserId = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>

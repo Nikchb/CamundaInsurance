@@ -44,9 +44,10 @@ namespace CamundaInsurance.Services.Insurance
             {
                 Status = lastRequest.Status,                
                 Cost = lastRequest.Cost,
-                ApprovalTime = lastRequest.ApprovalTime,
-                InsuranceType = lastRequest.InsuranceType,
-                Reason = lastRequest.Reason                
+                ApprovalDate = lastRequest.ApprovalDate,
+                Tariff = lastRequest.Triff,
+                Reason = lastRequest.Reason,
+                InsuranceStartDate = lastRequest.InsuranceStartDate
             });
         }  
         
@@ -56,6 +57,11 @@ namespace CamundaInsurance.Services.Insurance
             if(result != null)
             {
                 return Error(result.Select(v=>v.ErrorMessage).ToArray());
+            }
+
+            if(model.InsuranceStartDate < DateTime.Now.Date + TimeSpan.FromDays(7))
+            {
+                return Error("Insurance start date should be at least 7 days after the request");
             }
 
             var identityResponce = await identityService.GetCurrentUserAsync();
@@ -78,10 +84,11 @@ namespace CamundaInsurance.Services.Insurance
             var insuranceRequest = new InsuranceRequest 
             {
                 Status = InsuranceRequestStatus.InProcess,
-                InsuranceType = model.InsuranceType,
+                Triff = model.Tariff,
+                InsuranceStartDate = model.InsuranceStartDate,
                 Height = model.Height,
                 Weight = model.Weight,
-                HealthHistoryRisk = model.HealthHistoryRisk,
+                PreExistingConditions = model.PreExistingConditions,
                 UserId = user.Id
             };
 
@@ -114,7 +121,7 @@ namespace CamundaInsurance.Services.Insurance
             insuranceRequest.Status = model.Status;
             insuranceRequest.Cost = model.Cost;
             insuranceRequest.Reason = model.Reason;
-            insuranceRequest.ApprovalTime = DateTime.Now;
+            insuranceRequest.ApprovalDate = DateTime.Now;
 
             await context.SaveChangesAsync();
 
@@ -139,7 +146,7 @@ namespace CamundaInsurance.Services.Insurance
                 return Error("No active insurance found");
             }
 
-            if(DateTime.Now.Date - request.ApprovalTime.Date > TimeSpan.FromDays(14))
+            if(DateTime.Now.Date - request.ApprovalDate.Date > TimeSpan.FromDays(14))
             {
                 return Error("Insurance can not be revoked after 14 days");
             }

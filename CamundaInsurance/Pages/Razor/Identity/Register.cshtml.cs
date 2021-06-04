@@ -61,6 +61,11 @@ namespace CamundaInsurance.Pages.Razor.Identity
         public string Surname { get; set; }
 
         [Required]
+        [Display(Name = "Gender")]
+        [BindProperty]
+        public string Gender { get; set; }
+
+        [Required]
         [DataType(DataType.Date)]
         [Display(Name = "Birth Date")]
         [BindProperty]
@@ -74,6 +79,33 @@ namespace CamundaInsurance.Pages.Razor.Identity
         [BindProperty]
         public string InsuranceCardNumber { get; set; }
 
+        [Required]
+        [DataType(DataType.Text)]
+        [Display(Name = "Post Index")]
+        [MinLength(5)]
+        [MaxLength(5)]
+        [RegularExpression("^[0-9]*$")]
+        [BindProperty]
+        public string PostIndex { get; set; }
+
+        [Required]
+        [DataType(DataType.Text)]
+        [Display(Name = "City")]
+        [BindProperty]
+        public string City { get; set; }
+
+        [Required]
+        [DataType(DataType.Text)]
+        [Display(Name = "Street")]
+        [BindProperty]
+        public string Street { get; set; }
+
+        [Required]
+        [DataType(DataType.Text)]
+        [Display(Name = "House Number")]
+        [BindProperty]
+        public string HouseNumber { get; set; }
+
         public void OnGet()
         {           
         }
@@ -83,12 +115,16 @@ namespace CamundaInsurance.Pages.Razor.Identity
             if (ModelState.IsValid)
             {
                 var user = new User { 
-                    UserName = Email, 
-                    Email = Email.Trim(), 
+                    UserName = Email,                    
                     BirthDay = BirthDay,
                     InsuranceCardNumber = InsuranceCardNumber,
                     Name = Name,
-                    SurName = Surname
+                    SurName = Surname,
+                    Gender = Gender,
+                    PostIndex = PostIndex,
+                    City = City,
+                    Street = Street,
+                    HouseNumber = HouseNumber
                 };
                 var result = await _userManager.CreateAsync(user, Password);
                 if (result.Succeeded)
