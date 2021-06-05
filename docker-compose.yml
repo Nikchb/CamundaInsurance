@@ -24,6 +24,7 @@ services:
             - DB_PASSWORD=camunda
             - WAIT_FOR=postgres:5432
             - CAMUNDA_BPM_AUTHORIZATION_ENABLED=true
+            - CAMUNDA_BPM_HISTORY-LEVEL=NONE
         links:
             - postgres
         ports:
