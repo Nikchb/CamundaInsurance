@@ -19,7 +19,7 @@ namespace CamundaInsurance.Services.Insurance.Models
 
         [Required]
         public DateTime InsuranceStartDate { get; set; } = DateTime.Now + TimeSpan.FromDays(7);
-        
-        public string PreExistingConditions { get; set; }
+
+        public string PreExistingConditions { get; set; } = "";
     }
 }

@@ -1,6 +1,8 @@
 ﻿using CamundaInsurance.Data;
 using CamundaInsurance.Data.Models;
+using CamundaInsurance.Services.Camunda;
 using CamundaInsurance.Services.Insurance.Models;
+using CamundaInsurance.Services.Camunda.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using System;
@@ -16,10 +18,13 @@ namespace CamundaInsurance.Services.Insurance
 
         private readonly IdentityService identityService;
 
-        public InsuranceManager(ApplicationDbContext context, IdentityService identityService)
+        private readonly CamundaProcessStarter camundaProcessStarter;
+
+        public InsuranceManager(ApplicationDbContext context, IdentityService identityService, CamundaProcessStarter camundaProcessStarter)
         {
             this.context = context ?? throw new ArgumentNullException(nameof(context));
             this.identityService = identityService ?? throw new ArgumentNullException(nameof(identityService));
+            this.camundaProcessStarter = camundaProcessStarter ?? throw new ArgumentNullException(nameof(camundaProcessStarter));
         }
 
         public async Task<SContentResponce<InsuranceInfoModel>> GetInsuranceInfoAsync()
@@ -93,10 +98,24 @@ namespace CamundaInsurance.Services.Insurance
             };
 
             // send request to camunda
-            var camundaResponce = new SContentResponce<int>(true);
+            var processModel = new StartProcessModel();
+            processModel.Add("requestId", insuranceRequest.Id);
+            processModel.Add("name", user.Name);
+            processModel.Add("surname", user.SurName);
+            processModel.Add("birthDate", user.BirthDay);
+            processModel.Add("address", user.Address);
+            processModel.Add("gender", user.Gender);
+            processModel.Add("height", insuranceRequest.Height);
+            processModel.Add("weight", insuranceRequest.Weight);
+            processModel.Add("preExistingConditions", insuranceRequest.PreExistingConditions);
+            processModel.Add("tariff", insuranceRequest.Triff);
+            processModel.Add("age", (int)((DateTime.Now - user.BirthDay).TotalDays / 365.23));
+            processModel.Add("insuranceStartDate", insuranceRequest.InsuranceStartDate);           
+
+            var camundaResponce = await camundaProcessStarter.StartProcess("InsuranceRequestHandling", processModel);          
             if(camundaResponce.Succeeded == false)
             {
-                return Error("Service in temporary unavalable");
+                return Error(camundaResponce.Messages);
             }
 
             await context.InsuranceRequests.AddAsync(insuranceRequest);
