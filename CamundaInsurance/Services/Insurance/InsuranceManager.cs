@@ -102,15 +102,16 @@ namespace CamundaInsurance.Services.Insurance
             processModel.Add("requestId", insuranceRequest.Id);
             processModel.Add("name", user.Name);
             processModel.Add("surname", user.SurName);
-            processModel.Add("birthDate", user.BirthDay);
+            processModel.Add("birthDate", user.BirthDay);           
             processModel.Add("address", user.Address);
             processModel.Add("gender", user.Gender);
+            processModel.Add("tariff", insuranceRequest.Triff);
+            processModel.Add("insuranceStartDate", insuranceRequest.InsuranceStartDate);
             processModel.Add("height", insuranceRequest.Height);
             processModel.Add("weight", insuranceRequest.Weight);
             processModel.Add("preExistingConditions", insuranceRequest.PreExistingConditions);
-            processModel.Add("tariff", insuranceRequest.Triff);
             processModel.Add("age", (int)((DateTime.Now - user.BirthDay).TotalDays / 365.23));
-            processModel.Add("insuranceStartDate", insuranceRequest.InsuranceStartDate);           
+            processModel.Add("isExistingCustomer", !string.IsNullOrWhiteSpace(user.InsuranceCardNumber));
 
             var camundaResponce = await camundaProcessStarter.StartProcess("InsuranceRequestHandling", processModel);          
             if(camundaResponce.Succeeded == false)
