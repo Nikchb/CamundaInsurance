@@ -1,5 +1,8 @@
+using Camunda.Worker;
+using Camunda.Worker.Client;
 using CamundaInsurance.Data;
 using CamundaInsurance.Data.Models;
+using CamundaInsurance.Handlers;
 using CamundaInsurance.Services;
 using CamundaInsurance.Services.Camunda;
 using CamundaInsurance.Services.Insurance;
@@ -43,7 +46,14 @@ namespace CamundaInsurance
             services.AddTransient<InsuranceManager>();
             services.AddSingleton(new CamundaProcessStarter());
             services.AddDatabaseDeveloperPageExceptionFilter();
-            
+
+            services.AddExternalTaskClient()
+                .ConfigureHttpClient((provider, client) =>
+                {
+                    client.BaseAddress = new Uri($"http://{Environment.GetEnvironmentVariable("CAMUNDA_URL") ?? "webapp:80"}/engine-rest");
+                });
+
+            services.AddCamundaWorker("sampleWorker").AddHandler<InsuranceDenyHandler>();
         }
 
         private void ConfigureDB(IServiceCollection services)

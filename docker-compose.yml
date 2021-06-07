@@ -13,12 +13,11 @@ services:
             - DB_USERNAME=camunda
             - DB_PASSWORD=camunda
             - CAMUNDA_URL=camunda:8080
-            - CAMUNDA_RETURN_URL=webapp:80
         ports:
             - "5020:80"
         restart: always
     camunda:
-        image: camunda/camunda-bpm-platform:tomcat-latest
+        image: camunda/camunda-bpm-platform:run-latest
         environment:
             - DB_DRIVER=org.postgresql.Driver
             - DB_URL=jdbc:postgresql://postgres:5432/camunda
