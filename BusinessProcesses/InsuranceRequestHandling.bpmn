@@ -1,12 +1,134 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" id="Definitions_18zktoq" targetNamespace="http://bpmn.io/schema/bpmn" xmlns:modeler="http://camunda.org/schema/modeler/1.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.14.0">
-  <bpmn:process id="Process_1vx298a" isExecutable="true">
-    <bpmn:startEvent id="StartEvent_1" />
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_18zktoq" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.7.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.14.0">
+  <bpmn:process id="InsuranceRequestHandling" name="InsuranceRequestHandling" isExecutable="true">
+    <bpmn:sequenceFlow id="Flow_0wgzpot" sourceRef="Start" targetRef="CheckInformation" />
+    <bpmn:userTask id="CheckInformation" name="Check Information">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="surname" label="Surname" type="string" />
+          <camunda:formField id="name" label="Name" type="string" />
+          <camunda:formField id="birthDate" label="Date of birth" type="date" />
+          <camunda:formField id="address" label="Address" type="string" />
+          <camunda:formField id="tariff" label="Tariff" type="enum">
+            <camunda:value id="Basic" name="Basic" />
+            <camunda:value id="Premium" name="Premium" />
+          </camunda:formField>
+          <camunda:formField id="gender" label="Gender" type="enum">
+            <camunda:value id="Male" name="Male" />
+            <camunda:value id="Female" name="Female" />
+          </camunda:formField>
+          <camunda:formField id="height" label="Height" type="long" />
+          <camunda:formField id="weight" label="Weight" type="long" />
+          <camunda:formField id="preExistingConditions" label="Pre-existing conditions" type="string" />
+          <camunda:formField id="checkStatus" label="Check status" type="enum" defaultValue="Approved">
+            <camunda:value id="Denied" name="Denied" />
+            <camunda:value id="Approved" name="Approved" />
+          </camunda:formField>
+          <camunda:formField id="reason" label="Deny reason" type="string" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0wgzpot</bpmn:incoming>
+      <bpmn:incoming>NoReasonCheckDeny</bpmn:incoming>
+      <bpmn:outgoing>Flow_1cog3v9</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_1cog3v9" sourceRef="CheckInformation" targetRef="Gateway_1ybz8kr" />
+    <bpmn:exclusiveGateway id="Gateway_1ybz8kr">
+      <bpmn:incoming>Flow_1cog3v9</bpmn:incoming>
+      <bpmn:outgoing>NoReasonCheckDeny</bpmn:outgoing>
+      <bpmn:outgoing>CheckDeny</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="NoReasonCheckDeny" name="No Reason Deny" sourceRef="Gateway_1ybz8kr" targetRef="CheckInformation">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${checkStatus == 'Denied' and (reason == '' or reason == null)}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="CheckDeny" name="Deny" sourceRef="Gateway_1ybz8kr" targetRef="InformationInvalid">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${checkStatus == 'Denied' and reason != '' and reason != null }</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:serviceTask id="InformationInvalid" name="Information Invalid" camunda:type="external" camunda:topic="insuranceDeny">
+      <bpmn:incoming>CheckDeny</bpmn:incoming>
+      <bpmn:outgoing>Flow_1jzx0yk</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndInvalidInformation" name="End Invalid Information">
+      <bpmn:incoming>Flow_1jzx0yk</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1jzx0yk" sourceRef="InformationInvalid" targetRef="EndInvalidInformation" />
+    <bpmn:startEvent id="Start" name="Start">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="surname" label="Surname" type="string" />
+          <camunda:formField id="name" label="Name" type="string" />
+          <camunda:formField id="birthDate" label="Date of birth" type="date" />
+          <camunda:formField id="address" label="Address" type="string" />
+          <camunda:formField id="gender" label="Gender" type="enum">
+            <camunda:value id="Male" name="Male" />
+            <camunda:value id="Female" name="Female" />
+          </camunda:formField>
+          <camunda:formField id="height" label="Height" type="long" />
+          <camunda:formField id="weight" label="Weight" type="long" />
+          <camunda:formField id="preExistingConditions" label="Pre-existing conditions" type="string" />
+          <camunda:formField id="tariff" label="Tariff" type="enum">
+            <camunda:value id="Basic" name="Basic" />
+            <camunda:value id="Premium" name="Premuim" />
+          </camunda:formField>
+          <camunda:formField id="age" label="Age" type="long" />
+          <camunda:formField id="insuranceStartDate" label="Insurance start date" type="date" />
+          <camunda:formField id="requestId" label="Request Id" type="string" />
+          <camunda:formField id="returnUrl" label="ReturnUrl" type="string" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_0wgzpot</bpmn:outgoing>
+    </bpmn:startEvent>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1vx298a">
-      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
-        <dc:Bounds x="179" y="159" width="36" height="36" />
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="InsuranceRequestHandling">
+      <bpmndi:BPMNEdge id="Flow_1jzx0yk_di" bpmnElement="Flow_1jzx0yk">
+        <di:waypoint x="660" y="120" />
+        <di:waypoint x="722" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_15teya7_di" bpmnElement="CheckDeny">
+        <di:waypoint x="500" y="215" />
+        <di:waypoint x="500" y="120" />
+        <di:waypoint x="560" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="503" y="165" width="26" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0kucvn2_di" bpmnElement="NoReasonCheckDeny">
+        <di:waypoint x="500" y="265" />
+        <di:waypoint x="500" y="320" />
+        <di:waypoint x="320" y="320" />
+        <di:waypoint x="320" y="280" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="369" y="302" width="84" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1cog3v9_di" bpmnElement="Flow_1cog3v9">
+        <di:waypoint x="370" y="240" />
+        <di:waypoint x="475" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0wgzpot_di" bpmnElement="Flow_0wgzpot">
+        <di:waypoint x="188" y="240" />
+        <di:waypoint x="270" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_1fv5bun_di" bpmnElement="CheckInformation">
+        <dc:Bounds x="270" y="200" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0o4q3e6_di" bpmnElement="Gateway_1ybz8kr" isMarkerVisible="true">
+        <dc:Bounds x="475" y="215" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0b37t7v_di" bpmnElement="InformationInvalid">
+        <dc:Bounds x="560" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1scark7_di" bpmnElement="EndInvalidInformation">
+        <dc:Bounds x="722" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="713" y="145" width="56" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1bjy8od_di" bpmnElement="Start">
+        <dc:Bounds x="152" y="222" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="157" y="198" width="25" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
