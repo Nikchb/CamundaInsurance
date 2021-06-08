@@ -110,7 +110,6 @@ namespace CamundaInsurance.Services.Insurance
             processModel.Add("height", insuranceRequest.Height);
             processModel.Add("weight", insuranceRequest.Weight);
             processModel.Add("preExistingConditions", insuranceRequest.PreExistingConditions);
-            processModel.Add("age", (int)((DateTime.Now - user.BirthDay).TotalDays / 365.23));
             processModel.Add("isExistingCustomer", !string.IsNullOrWhiteSpace(user.InsuranceCardNumber));
 
             var camundaResponce = await camundaProcessStarter.StartProcess("InsuranceRequestHandling", processModel);          

@@ -53,7 +53,9 @@ namespace CamundaInsurance
                     client.BaseAddress = new Uri($"http://{Environment.GetEnvironmentVariable("CAMUNDA_URL") ?? "webapp:80"}/engine-rest");
                 });
 
-            services.AddCamundaWorker("sampleWorker").AddHandler<InsuranceDenyHandler>();
+            services.AddCamundaWorker("sampleWorker")
+                .AddHandler<InsuranceDenyHandler>()
+                .AddHandler<InsuranceApproveHandler>();
         }
 
         private void ConfigureDB(IServiceCollection services)
