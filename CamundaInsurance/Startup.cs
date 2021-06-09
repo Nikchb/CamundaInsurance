@@ -50,7 +50,7 @@ namespace CamundaInsurance
             services.AddExternalTaskClient()
                 .ConfigureHttpClient((provider, client) =>
                 {
-                    client.BaseAddress = new Uri($"http://{Environment.GetEnvironmentVariable("CAMUNDA_URL") ?? "webapp:80"}/engine-rest");
+                    client.BaseAddress = new Uri($"http://{Environment.GetEnvironmentVariable("CAMUNDA_URL") ?? "localhost:8080"}/engine-rest");
                 });
 
             services.AddCamundaWorker("sampleWorker")
@@ -72,6 +72,8 @@ namespace CamundaInsurance
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ApplicationDbContext context)
         {
+            CamundaStartup.ConfigureCamunda().Wait();  
+            
             context.Database.Migrate();
 
             if (env.IsDevelopment())
