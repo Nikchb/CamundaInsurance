@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Camunda.Api.Client;
+using Camunda.Api.Client.Deployment;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,28 +14,57 @@ namespace CamundaInsurance
 {
     public static class CamundaStartup
     {
-        public async static Task ConfigureCamunda()
+        public async static Task WaitForCamundaAsync()
         {
             using (var httpClient = new HttpClient())
             {
                 httpClient.BaseAddress = new Uri($"http://{Environment.GetEnvironmentVariable("CAMUNDA_URL") ?? "localhost:8080"}");
 
-                string status = null;
-                while (status == null)
+                while (true)
                 {
-                    var result = await httpClient.GetAsync("/engine-rest/user/count");
-                    if(result.IsSuccessStatusCode)
+                    try
                     {
-                        var dic = JsonSerializer.Deserialize<Dictionary<string,int>>(await result.Content.ReadAsStringAsync());
-                        status = dic["count"] > 1 ? "AlreadyConfugured" : "Confugure";
+                        var result = await httpClient.GetAsync("/engine-rest/user/count");
+                        if (result.IsSuccessStatusCode)
+                        {
+                            return;
+                        }                        
                     }
-                    else
+                    catch
                     {
-                        await Task.Delay(1000);
-                    }
 
+                    }
+                    await Task.Delay(1000);
                 }
+            }
+        }
 
+        public async static Task ConfigureCamundaAsync()
+        {
+            var camundaClient = CamundaClient.Create($"http://{Environment.GetEnvironmentVariable("CAMUNDA_URL") ?? "localhost:8080"}/engine-rest");
+            await camundaClient.Deployments.Create(
+                    deploymentName: "InsuranceRequestHandling",
+                    duplicateFiltering: true,
+                    changedOnly: true,
+                    deploymentSource: "WebApp",
+                    resources: new ResourceDataContent(File.OpenRead("BusinessProcesses/InsuranceRequestHandling.bpmn"), "InsuranceRequestHandling.bpmn"));
+
+            using (var httpClient = new HttpClient())
+            {
+                httpClient.BaseAddress = new Uri($"http://{Environment.GetEnvironmentVariable("CAMUNDA_URL") ?? "localhost:8080"}");
+
+                string status;
+                var result = await httpClient.GetAsync("/engine-rest/user/count");
+                if (result.IsSuccessStatusCode)
+                {
+                    var dic = JsonSerializer.Deserialize<Dictionary<string, int>>(await result.Content.ReadAsStringAsync());
+                    status = dic["count"] > 1 ? "AlreadyConfugured" : "Confugure";
+                }
+                else
+                {
+                    throw new Exception("Service unavailable");
+                }
+                
                 if (status == "AlreadyConfugured")
                 {
                     return;
@@ -46,15 +77,6 @@ namespace CamundaInsurance
                         type = 0,
                         resourceType = 0,
                         resourceId = "tasklist",
-                        permissions = new string[] { "ALL" },
-                        userId = "*"
-                    });
-                await httpClient.PostAsJsonAsync("/engine-rest/authorization/create",
-                    new
-                    {
-                        type = 0,
-                        resourceType = 7,
-                        resourceId = "*",
                         permissions = new string[] { "ALL" },
                         userId = "*"
                     });
@@ -86,7 +108,7 @@ namespace CamundaInsurance
                     {
                         id = "headOfTheUnderwritingDepartment",
                         name = "Head of the underwriting department"
-                    });                
+                    });
 
                 //create users
                 await httpClient.PostAsJsonAsync("/engine-rest/user/create",
@@ -120,7 +142,7 @@ namespace CamundaInsurance
                         }
                     });
                 await httpClient.PutAsJsonAsync("/engine-rest/group/insuranceOfficers/members/bobBrown", new { });
-                
+
                 await httpClient.PostAsJsonAsync("/engine-rest/user/create",
                     new
                     {
@@ -136,18 +158,6 @@ namespace CamundaInsurance
                         }
                     });
                 await httpClient.PutAsJsonAsync("/engine-rest/group/headOfTheUnderwritingDepartment/members/tomLee", new { });
-
-                //var data = await File.ReadAllBytesAsync("/app/BusinessProcesses/InsuranceRequestHandling.bpmn");
-
-                //var requestContent = new MultipartFormDataContent();
-                ////    here you can specify boundary if you need---^
-                //var imageContent = new ByteArrayContent(ImageData);
-                //imageContent.Headers.ContentType =
-                //    MediaTypeHeaderValue.Parse("image/jpeg");
-
-                //requestContent.Add(imageContent, "image", "image.jpg");
-
-                //return await client.PostAsync(url, requestContent);
             }
         }
     }

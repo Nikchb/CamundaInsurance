@@ -14,7 +14,7 @@ services:
             - DB_PASSWORD=camunda
             - CAMUNDA_URL=camunda:8080
         volumes:
-            -./BusinessProcesses:/app/BusinessProcesses
+            - ./BusinessProcesses:/app/BusinessProcesses/
         ports:
             - "5020:80"
         restart: always
