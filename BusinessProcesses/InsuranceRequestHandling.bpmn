@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_18zktoq" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.7.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.14.0">
-  <bpmn:collaboration id="Collaboration_10737uh">
+  <bpmn:collaboration id="InsuranceApplication">
     <bpmn:participant id="Participant_0qv0tma" name="Insurance Company" processRef="InsuranceRequestHandling" />
   </bpmn:collaboration>
   <bpmn:process id="InsuranceRequestHandling" name="InsuranceRequestHandling" isExecutable="true">
@@ -8,16 +8,39 @@
       <bpmn:lane id="Lane_03vj88f" name="Underwriting clerk">
         <bpmn:flowNodeRef>CheckedForCompleteness</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>CheckApplicationCompleteness</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>InformationInvalid</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>EndInvalidInformation</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>InformationIncomplete</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndIncompleteInformation</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>InsuranceApproved</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CheckedInsurancePolicyInformation</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndInsuranceApproved</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Start</bpmn:flowNodeRef>
+        <bpmn:childLaneSet id="LaneSet_1gxu9a6" />
+      </bpmn:lane>
+      <bpmn:lane id="Lane_111ejh0" name="Head of the underwriting department">
+        <bpmn:flowNodeRef>Gateway_0fqr1si</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ManualCheckRejection</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndManualCheckRejection</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ManualCheck</bpmn:flowNodeRef>
       </bpmn:lane>
       <bpmn:lane id="Lane_0aulvib" name="Insurance officer">
+        <bpmn:flowNodeRef>Gateway_0ldtl0t</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CalculateRiskFactorsAge</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>calculateRiskFactorsGeneralConditions</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CalculateRiskFactorHealthHistory</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>DefinePreExistingConditionsCategory</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_0l6bx2n</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_0c6z9he</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_1y78ux7</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>DefineRejectionReason</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_0boi3yy</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>RateCalculation</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>InsuranceRejected</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>EndInsuranceRejected</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>DefineDecisionForPremiumTariff</bpmn:flowNodeRef>
         <bpmn:childLaneSet id="LaneSet_04acobg" />
       </bpmn:lane>
-      <bpmn:lane id="Lane_111ejh0" name="Head of  insurance department" />
     </bpmn:laneSet>
-    <bpmn:userTask id="CheckedForCompleteness" name="Checked for completeness">
+    <bpmn:userTask id="CheckedForCompleteness" name="Checked for completeness" camunda:candidateGroups="underwritingClerks">
       <bpmn:extensionElements>
         <camunda:formData>
           <camunda:formField id="surname" label="Surname" type="string">
@@ -74,23 +97,451 @@
           <camunda:formField id="reason" label="Deny reason" type="string" />
         </camunda:formData>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_0wgzpot</bpmn:incoming>
       <bpmn:incoming>IncompleteNoReason</bpmn:incoming>
+      <bpmn:incoming>Flow_1iuymyk</bpmn:incoming>
       <bpmn:outgoing>Flow_1cog3v9</bpmn:outgoing>
     </bpmn:userTask>
     <bpmn:exclusiveGateway id="CheckApplicationCompleteness" name="Check application completeness">
       <bpmn:incoming>Flow_1cog3v9</bpmn:incoming>
       <bpmn:outgoing>IncompleteNoReason</bpmn:outgoing>
       <bpmn:outgoing>Incomplete</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1qrr293</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:serviceTask id="InformationInvalid" name="Information invalid" camunda:type="external" camunda:topic="insuranceDeny">
+    <bpmn:serviceTask id="InformationIncomplete" name="Information incomplete" camunda:type="external" camunda:topic="insuranceDeny">
       <bpmn:incoming>Incomplete</bpmn:incoming>
       <bpmn:outgoing>Flow_1jzx0yk</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:endEvent id="EndInvalidInformation" name="End invalid information">
+    <bpmn:endEvent id="EndIncompleteInformation" name="End incomplete information">
       <bpmn:incoming>Flow_1jzx0yk</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:startEvent id="Start" name="Start">
+    <bpmn:parallelGateway id="Gateway_0ldtl0t">
+      <bpmn:incoming>Flow_0v86ntw</bpmn:incoming>
+      <bpmn:outgoing>Flow_1j97fst</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0yx9bic</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1u0x8qj</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:scriptTask id="CalculateRiskFactorsAge" name="Calculate risk factors age" scriptFormat="JavaScript">
+      <bpmn:incoming>Flow_1j97fst</bpmn:incoming>
+      <bpmn:outgoing>Flow_1r3b8l0</bpmn:outgoing>
+      <bpmn:script>function calculateAge(date) 
+{ 
+    var diff_ms = Date.now() - date.getTime();
+    var age_dt = new Date(diff_ms); 
+  
+    return Math.abs(age_dt.getUTCFullYear() - 1970);
+}
+
+var bithDate = execution.getVariable("birthDate");
+var age = calculateAge(bithDate); 
+execution.setVariable("age", age);
+
+var riskFactor = 0;
+if(age &gt; 45)
+{
+  riskFactor = 20;
+}
+if(age &gt; 55)
+{
+  riskFactor = 50;
+}
+if(age &gt; 60)
+{
+  riskFactor = 70;
+}
+if(age &gt; 70)
+{
+  riskFactor = 90;
+}
+
+execution.setVariable("ageRiskFactor", riskFactor);</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:scriptTask id="calculateRiskFactorsGeneralConditions" name="Calculate risk factors general conditions" scriptFormat="JavaScript">
+      <bpmn:incoming>Flow_0yx9bic</bpmn:incoming>
+      <bpmn:outgoing>Flow_1otomua</bpmn:outgoing>
+      <bpmn:script>var height = execution.getVariable("height");
+var weight = execution.getVariable("weight");
+
+var bmi = (100 * 100 *  weight) / (height * height);
+
+var riskFactor = 0;
+if(bmi &lt; 20)
+{
+  riskFactor = 50;
+}
+if(bmi &gt; 29)
+{
+  riskFactor = 50;
+}
+if(bmi &gt; 32)
+{
+  riskFactor = 70;
+}
+if(bmi &gt; 35)
+{
+  riskFactor = 100;
+}
+
+execution.setVariable("generalConditionsRiskFactor", riskFactor);</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:scriptTask id="CalculateRiskFactorHealthHistory" name="Calculate risk factor health history" scriptFormat="JavaScript">
+      <bpmn:incoming>Flow_1u0x8qj</bpmn:incoming>
+      <bpmn:outgoing>Flow_0xe2hrs</bpmn:outgoing>
+      <bpmn:script>var riskCategory = execution.getVariable("riskCategory");
+
+var riskFactor = 0;
+if(riskCategory == 1)
+{
+  riskFactor = 20;
+}
+if(riskCategory == 2)
+{
+  riskFactor = 50;
+}
+if(riskCategory == 3)
+{
+  riskFactor = 100;
+}
+
+execution.setVariable("healthHistoryRiskFactor", riskFactor);</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:userTask id="DefinePreExistingConditionsCategory" name="Define pre-existing conditions category" camunda:candidateGroups="insuranceOfficers">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="surname" label="Surname" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="name" label="Name" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="birthDate" label="Date of birth" type="date">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="gender" label="Gender" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="height" label="Height" type="long">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="weight" label="Weight" type="long">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="preExistingConditions" label="Pre-existing conditions" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id=" riskCategory" label="Risk category" type="enum">
+            <camunda:value id="C0" name="No critical pre-existing conditions" />
+            <camunda:value id="C1" name="Risk category 1" />
+            <camunda:value id="C2" name="Risk category 2" />
+            <camunda:value id="C3" name="Risk category 3" />
+          </camunda:formField>
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1qrr293</bpmn:incoming>
+      <bpmn:outgoing>Flow_0v86ntw</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_0l6bx2n" name="Check tariff">
+      <bpmn:incoming>Flow_1happ4y</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ctprhz</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1pqsw4x</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:parallelGateway id="Gateway_0c6z9he">
+      <bpmn:incoming>Flow_1otomua</bpmn:incoming>
+      <bpmn:incoming>Flow_1r3b8l0</bpmn:incoming>
+      <bpmn:incoming>Flow_0xe2hrs</bpmn:incoming>
+      <bpmn:outgoing>Flow_1happ4y</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:exclusiveGateway id="Gateway_1y78ux7" name="Check eligibility">
+      <bpmn:incoming>Flow_1j83glw</bpmn:incoming>
+      <bpmn:outgoing>Flow_0xvh1og</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0vrg2ts</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1ta2mg0</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="InsuranceApproved" name="Insurance approved" camunda:type="external" camunda:topic="insuranceApprove">
+      <bpmn:incoming>Flow_0mlek94</bpmn:incoming>
+      <bpmn:outgoing>Flow_0gk7kxt</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="CheckedInsurancePolicyInformation" name="Checked insurance policy information" camunda:candidateGroups="underwritingClerks">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="surname" label="Surname" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="name" label="Name" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="birthDate" label="Date of birth" type="date">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="address" label="Address" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="gender" label="Gender" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="tariff" label="Tariff" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="insuranceStartDate" label="Insurance start date" type="date">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="rate" label="Monthly rate" type="long">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_10r5mw0</bpmn:incoming>
+      <bpmn:outgoing>Flow_0mlek94</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="EndInsuranceApproved" name="End insurance approved">
+      <bpmn:incoming>Flow_0gk7kxt</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="Gateway_0fqr1si">
+      <bpmn:incoming>Flow_023i9h8</bpmn:incoming>
+      <bpmn:outgoing>Flow_0s1iosi</bpmn:outgoing>
+      <bpmn:outgoing>Flow_03nnhd7</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0kjikel</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="DefineRejectionReason" name="Define rejection reason" camunda:candidateGroups="insuranceOfficers">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="surname" label="Surname" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="name" label="Name" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="birthDate" label="Date of birth" type="date">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="gender" label="Gender" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="height" label="Height" type="long">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="weight" label="Weight" type="long">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="preExistingConditions" label="Pre-existing conditions" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="ageRiskFactor" label="Age risk factor" type="long">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="generalConditionsRiskFactor" label="General conditions risk factor" type="long">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="healthHistoryRiskFactor" label="Health history risk factor" type="long">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="reason" label="Rejection reason" type="string" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1ta2mg0</bpmn:incoming>
+      <bpmn:incoming>Flow_0zhv5ed</bpmn:incoming>
+      <bpmn:outgoing>Flow_14hikcw</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_0boi3yy">
+      <bpmn:incoming>Flow_14hikcw</bpmn:incoming>
+      <bpmn:outgoing>Flow_0zhv5ed</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0ivup4z</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:scriptTask id="RateCalculation" name="Rate calculation" scriptFormat="JavaScript">
+      <bpmn:incoming>Flow_1pqsw4x</bpmn:incoming>
+      <bpmn:incoming>Flow_03nnhd7</bpmn:incoming>
+      <bpmn:incoming>Flow_0vrg2ts</bpmn:incoming>
+      <bpmn:outgoing>Flow_10r5mw0</bpmn:outgoing>
+      <bpmn:script>var age = execution.getVariable("age");
+var riskSurcharge = execution.getVariable("riskSurcharge");
+if(!riskSurcharge)
+{
+riskSurcharge = 0;
+}
+var isExistingCustomer = execution.getVariable("isExistingCustomer");
+
+var rate = Math.max(110, 10 * age) + riskSurcharge;
+
+if(isExistingCustomer == true)
+{
+  rate = rate - 5;
+}
+
+execution.setVariable("rate", rate);</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:serviceTask id="InsuranceRejected" name="Insurance rejected" camunda:type="external" camunda:topic="insuranceDeny">
+      <bpmn:incoming>Flow_0ivup4z</bpmn:incoming>
+      <bpmn:outgoing>Flow_1qupupl</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndInsuranceRejected" name="End insurance rejected">
+      <bpmn:incoming>Flow_1qupupl</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="ManualCheckRejection" name="Manual check rejection" camunda:type="external" camunda:topic="insuranceDeny">
+      <bpmn:incoming>Flow_0kjikel</bpmn:incoming>
+      <bpmn:outgoing>Flow_0klsa2o</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndManualCheckRejection" name="End manual check rejection">
+      <bpmn:incoming>Flow_0klsa2o</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:userTask id="ManualCheck" name="Manual check" camunda:candidateGroups="headOfTheUnderwritingDepartment">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="surname" label="Surname" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="name" label="Name" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="birthDate" label="Date of birth" type="date">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="gender" label="Gender" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="height" label="Height" type="long">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="weight" label="Weight" type="long">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="preExistingConditions" label="Pre-existing conditions" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="ageRiskFactor" label="Age risk factor" type="long">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="generalConditionsRiskFactor" label="General conditions risk factor" type="long">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="healthHistoryRiskFactor" label="Health history risk factor" type="long">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="eligible" label="Eligible" type="boolean" />
+          <camunda:formField id="reason" label="Rejection reason" type="string" />
+          <camunda:formField id="riskSurcharge" label="Risk surcharge" type="long" defaultValue="0" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0xvh1og</bpmn:incoming>
+      <bpmn:incoming>Flow_0s1iosi</bpmn:incoming>
+      <bpmn:outgoing>Flow_023i9h8</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:scriptTask id="DefineDecisionForPremiumTariff" name="Define decision for premium tariff" scriptFormat="JavaScript" camunda:resultVariable="premiumTariffDecision">
+      <bpmn:incoming>Flow_0ctprhz</bpmn:incoming>
+      <bpmn:outgoing>Flow_1j83glw</bpmn:outgoing>
+      <bpmn:script>var ageRF = execution.getVariable("ageRiskFactor");
+var gcRF = execution.getVariable("generalConditionsRiskFactor");
+var hhRF = execution.getVariable("healthHistoryRiskFactor");
+
+var d = null;
+
+if(d == null &amp;&amp; gcRF == 100)
+{
+  d = "NotEligibleForInsurance";
+}
+if(d == null &amp;&amp; hhRF == 100)
+{
+  d = "NotEligibleForInsurance";
+}
+if(d == null &amp;&amp; ageRF &gt;= 70)
+{
+  d = "ManualCheck";
+}
+if(d == null &amp;&amp; gcRF &gt;= 70)
+{
+  d = "ManualCheck";
+}
+if(d == null &amp;&amp; hhRF &gt;= 50)
+{
+  d = "ManualCheck";
+}
+if(d == null &amp;&amp; ageRF &gt;= 50 &amp;&amp; gcRF &gt;= 50)
+{
+  d = "ManualCheck";
+}
+if(d == null &amp;&amp; ageRF &gt;= 50 &amp;&amp; gcRF &lt; 50)
+{
+  d = "EligibleForInsurance";
+}
+if(d == null &amp;&amp; ageRF &lt; 50 &amp;&amp; gcRF &gt;= 50)
+{
+  d = "EligibleForInsurance";
+}
+if(d == null &amp;&amp; ageRF &lt; 50 &amp;&amp; gcRF &lt; 50 &amp;&amp; hhRF &lt; 50)
+{
+  d = "EligibleForInsurance";
+}
+execution.setVariable("premiumTariffDecision" ,d);</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:startEvent id="Start" name="Form submitted by customer">
       <bpmn:extensionElements>
         <camunda:formData>
           <camunda:formField id="requestId" label="Request Id" type="string" />
@@ -104,87 +555,370 @@
           <camunda:formField id="height" label="Height" type="long" />
           <camunda:formField id="weight" label="Weight" type="long" />
           <camunda:formField id="preExistingConditions" label="Pre-existing conditions" type="string" />
-          <camunda:formField id="age" label="Age" type="long" />
           <camunda:formField id="isExistingCustomer" label="Is existing customer" type="boolean" />
         </camunda:formData>
       </bpmn:extensionElements>
-      <bpmn:outgoing>Flow_0wgzpot</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1iuymyk</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:sequenceFlow id="Flow_1jzx0yk" sourceRef="InformationInvalid" targetRef="EndInvalidInformation" />
-    <bpmn:sequenceFlow id="Incomplete" name="Incomplete" sourceRef="CheckApplicationCompleteness" targetRef="InformationInvalid">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${applicationComplete == false and reason != '' and reason != null }</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1cog3v9" sourceRef="CheckedForCompleteness" targetRef="CheckApplicationCompleteness" />
     <bpmn:sequenceFlow id="IncompleteNoReason" name="Incomplete no reason " sourceRef="CheckApplicationCompleteness" targetRef="CheckedForCompleteness">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${applicationComplete == false and (reason == '' or reason == null)}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_1cog3v9" sourceRef="CheckedForCompleteness" targetRef="CheckApplicationCompleteness" />
-    <bpmn:sequenceFlow id="Flow_0wgzpot" sourceRef="Start" targetRef="CheckedForCompleteness" />
+    <bpmn:sequenceFlow id="Incomplete" name="Incomplete" sourceRef="CheckApplicationCompleteness" targetRef="InformationIncomplete">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${applicationComplete == false and reason != '' and reason != null }</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1jzx0yk" sourceRef="InformationIncomplete" targetRef="EndIncompleteInformation" />
+    <bpmn:sequenceFlow id="Flow_1qrr293" name="Complete" sourceRef="CheckApplicationCompleteness" targetRef="DefinePreExistingConditionsCategory">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${applicationComplete == true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0v86ntw" sourceRef="DefinePreExistingConditionsCategory" targetRef="Gateway_0ldtl0t" />
+    <bpmn:sequenceFlow id="Flow_1j97fst" sourceRef="Gateway_0ldtl0t" targetRef="CalculateRiskFactorsAge" />
+    <bpmn:sequenceFlow id="Flow_0yx9bic" sourceRef="Gateway_0ldtl0t" targetRef="calculateRiskFactorsGeneralConditions" />
+    <bpmn:sequenceFlow id="Flow_1u0x8qj" sourceRef="Gateway_0ldtl0t" targetRef="CalculateRiskFactorHealthHistory" />
+    <bpmn:sequenceFlow id="Flow_1otomua" sourceRef="calculateRiskFactorsGeneralConditions" targetRef="Gateway_0c6z9he" />
+    <bpmn:sequenceFlow id="Flow_1r3b8l0" sourceRef="CalculateRiskFactorsAge" targetRef="Gateway_0c6z9he" />
+    <bpmn:sequenceFlow id="Flow_0xe2hrs" sourceRef="CalculateRiskFactorHealthHistory" targetRef="Gateway_0c6z9he" />
+    <bpmn:sequenceFlow id="Flow_1happ4y" sourceRef="Gateway_0c6z9he" targetRef="Gateway_0l6bx2n" />
+    <bpmn:sequenceFlow id="Flow_0ctprhz" name="Premium tariff" sourceRef="Gateway_0l6bx2n" targetRef="DefineDecisionForPremiumTariff">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${tariff == "Premium"}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1j83glw" sourceRef="DefineDecisionForPremiumTariff" targetRef="Gateway_1y78ux7" />
+    <bpmn:sequenceFlow id="Flow_0xvh1og" name="Manual check" sourceRef="Gateway_1y78ux7" targetRef="ManualCheck">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${premiumTariffDecision == "ManualCheck"}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_023i9h8" sourceRef="ManualCheck" targetRef="Gateway_0fqr1si" />
+    <bpmn:sequenceFlow id="Flow_0s1iosi" name="Not eligible for insurance no reason" sourceRef="Gateway_0fqr1si" targetRef="ManualCheck">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${eligible == false and (reason == '' or reason == null)}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1pqsw4x" name="Basic tariff" sourceRef="Gateway_0l6bx2n" targetRef="RateCalculation">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${tariff == "Basic"}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_03nnhd7" name="Eligible for insurance" sourceRef="Gateway_0fqr1si" targetRef="RateCalculation">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${eligible == true}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_10r5mw0" sourceRef="RateCalculation" targetRef="CheckedInsurancePolicyInformation" />
+    <bpmn:sequenceFlow id="Flow_0mlek94" sourceRef="CheckedInsurancePolicyInformation" targetRef="InsuranceApproved" />
+    <bpmn:sequenceFlow id="Flow_0gk7kxt" sourceRef="InsuranceApproved" targetRef="EndInsuranceApproved" />
+    <bpmn:sequenceFlow id="Flow_0vrg2ts" name="Eligible for insurance" sourceRef="Gateway_1y78ux7" targetRef="RateCalculation">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${premiumTariffDecision == "EligibleForInsurance"}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1ta2mg0" name="Not eligible for insurance" sourceRef="Gateway_1y78ux7" targetRef="DefineRejectionReason">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${premiumTariffDecision == "NotEligibleForInsurance"}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_14hikcw" sourceRef="DefineRejectionReason" targetRef="Gateway_0boi3yy" />
+    <bpmn:sequenceFlow id="Flow_0zhv5ed" name="No reason defined" sourceRef="Gateway_0boi3yy" targetRef="DefineRejectionReason">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${reason == null or reason == ''}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0ivup4z" sourceRef="Gateway_0boi3yy" targetRef="InsuranceRejected">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${reason != '' and reason != null }</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_1qupupl" sourceRef="InsuranceRejected" targetRef="EndInsuranceRejected" />
+    <bpmn:sequenceFlow id="Flow_0kjikel" name="Not eligible for insurance" sourceRef="Gateway_0fqr1si" targetRef="ManualCheckRejection">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${eligible == false and reason != '' and reason != null }</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0klsa2o" sourceRef="ManualCheckRejection" targetRef="EndManualCheckRejection" />
+    <bpmn:sequenceFlow id="Flow_1iuymyk" sourceRef="Start" targetRef="CheckedForCompleteness" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_10737uh">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="InsuranceApplication">
       <bpmndi:BPMNShape id="Participant_0qv0tma_di" bpmnElement="Participant_0qv0tma" isHorizontal="true">
-        <dc:Bounds x="160" y="80" width="1920" height="840" />
+        <dc:Bounds x="155" y="80" width="2660" height="800" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Lane_03vj88f_di" bpmnElement="Lane_03vj88f" isHorizontal="true">
-        <dc:Bounds x="190" y="80" width="1890" height="320" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Lane_0aulvib_di" bpmnElement="Lane_0aulvib" isHorizontal="true">
-        <dc:Bounds x="190" y="400" width="1890" height="250" />
+        <dc:Bounds x="185" y="80" width="2630" height="290" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Lane_111ejh0_di" bpmnElement="Lane_111ejh0" isHorizontal="true">
-        <dc:Bounds x="190" y="650" width="1890" height="270" />
+        <dc:Bounds x="185" y="660" width="2630" height="220" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_1jzx0yk_di" bpmnElement="Flow_1jzx0yk">
-        <di:waypoint x="830" y="140" />
-        <di:waypoint x="892" y="140" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_15teya7_di" bpmnElement="Incomplete">
-        <di:waypoint x="670" y="235" />
-        <di:waypoint x="670" y="140" />
-        <di:waypoint x="730" y="140" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="613" y="185" width="54" height="14" />
-        </bpmndi:BPMNLabel>
+      <bpmndi:BPMNShape id="Lane_0aulvib_di" bpmnElement="Lane_0aulvib" isHorizontal="true">
+        <dc:Bounds x="185" y="370" width="2630" height="290" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1cog3v9_di" bpmnElement="Flow_1cog3v9">
+        <di:waypoint x="445" y="260" />
+        <di:waypoint x="550" y="260" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0kucvn2_di" bpmnElement="IncompleteNoReason">
-        <di:waypoint x="670" y="285" />
-        <di:waypoint x="670" y="340" />
-        <di:waypoint x="490" y="340" />
-        <di:waypoint x="490" y="300" />
+        <di:waypoint x="575" y="285" />
+        <di:waypoint x="575" y="340" />
+        <di:waypoint x="395" y="340" />
+        <di:waypoint x="395" y="300" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="545" y="306" width="70" height="27" />
+          <dc:Bounds x="450" y="306" width="70" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1cog3v9_di" bpmnElement="Flow_1cog3v9">
-        <di:waypoint x="540" y="260" />
-        <di:waypoint x="645" y="260" />
+      <bpmndi:BPMNEdge id="Flow_15teya7_di" bpmnElement="Incomplete">
+        <di:waypoint x="575" y="235" />
+        <di:waypoint x="575" y="140" />
+        <di:waypoint x="675" y="140" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="518" y="185" width="54" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0wgzpot_di" bpmnElement="Flow_0wgzpot">
-        <di:waypoint x="358" y="260" />
-        <di:waypoint x="440" y="260" />
+      <bpmndi:BPMNEdge id="Flow_1jzx0yk_di" bpmnElement="Flow_1jzx0yk">
+        <di:waypoint x="775" y="140" />
+        <di:waypoint x="847" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1qrr293_di" bpmnElement="Flow_1qrr293">
+        <di:waypoint x="600" y="260" />
+        <di:waypoint x="625" y="260" />
+        <di:waypoint x="625" y="520" />
+        <di:waypoint x="675" y="520" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="631" y="319" width="48" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0v86ntw_di" bpmnElement="Flow_0v86ntw">
+        <di:waypoint x="775" y="520" />
+        <di:waypoint x="840" y="520" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1j97fst_di" bpmnElement="Flow_1j97fst">
+        <di:waypoint x="865" y="495" />
+        <di:waypoint x="865" y="430" />
+        <di:waypoint x="965" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0yx9bic_di" bpmnElement="Flow_0yx9bic">
+        <di:waypoint x="890" y="520" />
+        <di:waypoint x="965" y="520" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1u0x8qj_di" bpmnElement="Flow_1u0x8qj">
+        <di:waypoint x="865" y="545" />
+        <di:waypoint x="865" y="610" />
+        <di:waypoint x="965" y="610" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1otomua_di" bpmnElement="Flow_1otomua">
+        <di:waypoint x="1065" y="520" />
+        <di:waypoint x="1130" y="520" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1r3b8l0_di" bpmnElement="Flow_1r3b8l0">
+        <di:waypoint x="1065" y="430" />
+        <di:waypoint x="1155" y="430" />
+        <di:waypoint x="1155" y="495" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0xe2hrs_di" bpmnElement="Flow_0xe2hrs">
+        <di:waypoint x="1065" y="610" />
+        <di:waypoint x="1155" y="610" />
+        <di:waypoint x="1155" y="545" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1happ4y_di" bpmnElement="Flow_1happ4y">
+        <di:waypoint x="1180" y="520" />
+        <di:waypoint x="1230" y="520" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ctprhz_di" bpmnElement="Flow_0ctprhz">
+        <di:waypoint x="1255" y="545" />
+        <di:waypoint x="1255" y="600" />
+        <di:waypoint x="1365" y="600" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1270" y="570" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1j83glw_di" bpmnElement="Flow_1j83glw">
+        <di:waypoint x="1465" y="600" />
+        <di:waypoint x="1550" y="600" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0xvh1og_di" bpmnElement="Flow_0xvh1og">
+        <di:waypoint x="1575" y="625" />
+        <di:waypoint x="1575" y="775" />
+        <di:waypoint x="1675" y="775" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1580" y="691" width="69" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_023i9h8_di" bpmnElement="Flow_023i9h8">
+        <di:waypoint x="1775" y="775" />
+        <di:waypoint x="1950" y="775" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0s1iosi_di" bpmnElement="Flow_0s1iosi">
+        <di:waypoint x="1975" y="800" />
+        <di:waypoint x="1975" y="860" />
+        <di:waypoint x="1725" y="860" />
+        <di:waypoint x="1725" y="815" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1814" y="815" width="72" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1pqsw4x_di" bpmnElement="Flow_1pqsw4x">
+        <di:waypoint x="1255" y="495" />
+        <di:waypoint x="1255" y="450" />
+        <di:waypoint x="2195" y="450" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1278" y="463" width="52" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_03nnhd7_di" bpmnElement="Flow_03nnhd7">
+        <di:waypoint x="1975" y="750" />
+        <di:waypoint x="1975" y="725" />
+        <di:waypoint x="2155" y="725" />
+        <di:waypoint x="2155" y="450" />
+        <di:waypoint x="2195" y="450" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2018" y="701" width="53" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10r5mw0_di" bpmnElement="Flow_10r5mw0">
+        <di:waypoint x="2295" y="450" />
+        <di:waypoint x="2315" y="450" />
+        <di:waypoint x="2315" y="220" />
+        <di:waypoint x="2385" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0mlek94_di" bpmnElement="Flow_0mlek94">
+        <di:waypoint x="2485" y="220" />
+        <di:waypoint x="2565" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0gk7kxt_di" bpmnElement="Flow_0gk7kxt">
+        <di:waypoint x="2665" y="220" />
+        <di:waypoint x="2727" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0vrg2ts_di" bpmnElement="Flow_0vrg2ts">
+        <di:waypoint x="1575" y="575" />
+        <di:waypoint x="1575" y="450" />
+        <di:waypoint x="2195" y="450" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1578" y="491" width="53" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ta2mg0_di" bpmnElement="Flow_1ta2mg0">
+        <di:waypoint x="1600" y="600" />
+        <di:waypoint x="1675" y="600" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1589" y="571" width="72" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_14hikcw_di" bpmnElement="Flow_14hikcw">
+        <di:waypoint x="1775" y="600" />
+        <di:waypoint x="1800" y="600" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0zhv5ed_di" bpmnElement="Flow_0zhv5ed">
+        <di:waypoint x="1825" y="575" />
+        <di:waypoint x="1825" y="525" />
+        <di:waypoint x="1725" y="525" />
+        <di:waypoint x="1725" y="560" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1732" y="507" width="90" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ivup4z_di" bpmnElement="Flow_0ivup4z">
+        <di:waypoint x="1850" y="600" />
+        <di:waypoint x="1895" y="600" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1qupupl_di" bpmnElement="Flow_1qupupl">
+        <di:waypoint x="1995" y="600" />
+        <di:waypoint x="2057" y="600" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0kjikel_di" bpmnElement="Flow_0kjikel">
+        <di:waypoint x="2000" y="775" />
+        <di:waypoint x="2195" y="775" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2062" y="781" width="72" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0klsa2o_di" bpmnElement="Flow_0klsa2o">
+        <di:waypoint x="2295" y="775" />
+        <di:waypoint x="2377" y="775" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1iuymyk_di" bpmnElement="Flow_1iuymyk">
+        <di:waypoint x="298" y="260" />
+        <di:waypoint x="345" y="260" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_1fv5bun_di" bpmnElement="CheckedForCompleteness">
-        <dc:Bounds x="440" y="220" width="100" height="80" />
+        <dc:Bounds x="345" y="220" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_0o4q3e6_di" bpmnElement="CheckApplicationCompleteness" isMarkerVisible="true">
-        <dc:Bounds x="645" y="235" width="50" height="50" />
+        <dc:Bounds x="550" y="235" width="50" height="50" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="686" y="280" width="87" height="27" />
+          <dc:Bounds x="591" y="226" width="87" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0b37t7v_di" bpmnElement="InformationInvalid">
-        <dc:Bounds x="730" y="100" width="100" height="80" />
+      <bpmndi:BPMNShape id="Activity_0b37t7v_di" bpmnElement="InformationIncomplete">
+        <dc:Bounds x="675" y="100" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1scark7_di" bpmnElement="EndInvalidInformation">
-        <dc:Bounds x="892" y="122" width="36" height="36" />
+      <bpmndi:BPMNShape id="Event_1scark7_di" bpmnElement="EndIncompleteInformation">
+        <dc:Bounds x="847" y="122" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="884" y="165" width="55" height="27" />
+          <dc:Bounds x="829" y="165" width="76" height="27" />
         </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1fpxxph_di" bpmnElement="Gateway_0ldtl0t">
+        <dc:Bounds x="840" y="495" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1d42byv_di" bpmnElement="CalculateRiskFactorsAge">
+        <dc:Bounds x="965" y="390" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1do1uxx_di" bpmnElement="calculateRiskFactorsGeneralConditions">
+        <dc:Bounds x="965" y="480" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1thzp9v_di" bpmnElement="CalculateRiskFactorHealthHistory">
+        <dc:Bounds x="965" y="570" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1dj22rf_di" bpmnElement="DefinePreExistingConditionsCategory">
+        <dc:Bounds x="675" y="480" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0l6bx2n_di" bpmnElement="Gateway_0l6bx2n" isMarkerVisible="true">
+        <dc:Bounds x="1230" y="495" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1296" y="513" width="57" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_18qpe9k_di" bpmnElement="Gateway_0c6z9he">
+        <dc:Bounds x="1130" y="495" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1y78ux7_di" bpmnElement="Gateway_1y78ux7" isMarkerVisible="true">
+        <dc:Bounds x="1550" y="575" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1477" y="558" width="76" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0bwwzvj_di" bpmnElement="InsuranceApproved">
+        <dc:Bounds x="2565" y="180" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_17l95p7_di" bpmnElement="CheckedInsurancePolicyInformation">
+        <dc:Bounds x="2385" y="180" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0tgkjza_di" bpmnElement="EndInsuranceApproved">
+        <dc:Bounds x="2727" y="202" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2712" y="245" width="71" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0fqr1si_di" bpmnElement="Gateway_0fqr1si" isMarkerVisible="true">
+        <dc:Bounds x="1950" y="750" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_06tk5fo_di" bpmnElement="DefineRejectionReason">
+        <dc:Bounds x="1675" y="560" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0boi3yy_di" bpmnElement="Gateway_0boi3yy" isMarkerVisible="true">
+        <dc:Bounds x="1800" y="575" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0z2agk8_di" bpmnElement="RateCalculation">
+        <dc:Bounds x="2195" y="410" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0lpjq4g_di" bpmnElement="InsuranceRejected">
+        <dc:Bounds x="1895" y="560" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1ingx1d_di" bpmnElement="EndInsuranceRejected">
+        <dc:Bounds x="2057" y="582" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2042" y="625" width="71" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1k834uq_di" bpmnElement="ManualCheckRejection">
+        <dc:Bounds x="2195" y="735" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0y2jrw8_di" bpmnElement="EndManualCheckRejection">
+        <dc:Bounds x="2377" y="757" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2363" y="800" width="74" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0odl5p5_di" bpmnElement="ManualCheck">
+        <dc:Bounds x="1675" y="735" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1522kyf_di" bpmnElement="DefineDecisionForPremiumTariff">
+        <dc:Bounds x="1365" y="560" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1bjy8od_di" bpmnElement="Start">
-        <dc:Bounds x="322" y="242" width="36" height="36" />
+        <dc:Bounds x="262" y="242" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="327" y="218" width="25" height="14" />
+          <dc:Bounds x="243" y="285" width="77" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
