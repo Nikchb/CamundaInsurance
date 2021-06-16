@@ -1,14 +1,16 @@
 ﻿using CamundaInsurance.Data;
 using CamundaInsurance.Data.Models;
-using CamundaInsurance.Services.Camunda;
+
 using CamundaInsurance.Services.Insurance.Models;
-using CamundaInsurance.Services.Camunda.Models;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Camunda.Api.Client;
+using Camunda.Api.Client.Message;
 
 namespace CamundaInsurance.Services.Insurance
 {
@@ -18,13 +20,13 @@ namespace CamundaInsurance.Services.Insurance
 
         private readonly IdentityService identityService;
 
-        private readonly CamundaProcessStarter camundaProcessStarter;
+        private readonly CamundaClient camundaClient;
 
-        public InsuranceManager(ApplicationDbContext context, IdentityService identityService, CamundaProcessStarter camundaProcessStarter)
+        public InsuranceManager(ApplicationDbContext context, IdentityService identityService, CamundaClient camundaClient)
         {
             this.context = context ?? throw new ArgumentNullException(nameof(context));
             this.identityService = identityService ?? throw new ArgumentNullException(nameof(identityService));
-            this.camundaProcessStarter = camundaProcessStarter ?? throw new ArgumentNullException(nameof(camundaProcessStarter));
+            this.camundaClient = camundaClient ?? throw new ArgumentNullException(nameof(camundaClient));
         }
 
         public async Task<SContentResponce<InsuranceInfoModel>> GetInsuranceInfoAsync()
@@ -97,27 +99,34 @@ namespace CamundaInsurance.Services.Insurance
                 UserId = user.Id
             };
 
-            // send request to camunda
-            var processModel = new StartProcessModel();
-            processModel.Add("requestId", insuranceRequest.Id);
-            processModel.Add("name", user.Name);
-            processModel.Add("surname", user.SurName);
-            processModel.Add("birthDate", user.BirthDay);           
-            processModel.Add("address", user.Address);
-            processModel.Add("gender", user.Gender);
-            processModel.Add("tariff", insuranceRequest.Triff);
-            processModel.Add("insuranceStartDate", insuranceRequest.InsuranceStartDate);
-            processModel.Add("height", insuranceRequest.Height);
-            processModel.Add("weight", insuranceRequest.Weight);
-            processModel.Add("preExistingConditions", insuranceRequest.PreExistingConditions);
-            processModel.Add("isExistingCustomer", !string.IsNullOrWhiteSpace(user.InsuranceCardNumber));
 
-            var camundaResponce = await camundaProcessStarter.StartProcess("InsuranceRequestHandling", processModel);          
-            if(camundaResponce.Succeeded == false)
+            var message = new CorrelationMessage() 
+            { 
+                All = true, 
+                MessageName = "InsuranceApplicationForm"
+            };
+            message.ProcessVariables
+                .Set("requestId", insuranceRequest.Id)
+                .Set("name", user.Name)
+                .Set("surname", user.SurName)
+                .Set("birthDate", user.BirthDay)
+                .Set("address", user.Address)
+                .Set("gender", user.Gender)
+                .Set("tariff", insuranceRequest.Triff)
+                .Set("insuranceStartDate", insuranceRequest.InsuranceStartDate)
+                .Set("height", insuranceRequest.Height)
+                .Set("weight", insuranceRequest.Weight)
+                .Set("preExistingConditions", insuranceRequest.PreExistingConditions)
+                .Set("isExistingCustomer", !string.IsNullOrWhiteSpace(user.InsuranceCardNumber));
+            try
             {
-                return Error(camundaResponce.Messages);
+                var camundaResponce = await camundaClient.Messages.DeliverMessage(message);
             }
-
+            catch
+            {
+                return Error("Service temporarily unavailable");
+            }                    
+            
             await context.InsuranceRequests.AddAsync(insuranceRequest);
             await context.SaveChangesAsync();
             return Ok();

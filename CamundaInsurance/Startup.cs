@@ -1,10 +1,11 @@
+using Camunda.Api.Client;
 using Camunda.Worker;
 using Camunda.Worker.Client;
 using CamundaInsurance.Data;
 using CamundaInsurance.Data.Models;
 using CamundaInsurance.Handlers;
 using CamundaInsurance.Services;
-using CamundaInsurance.Services.Camunda;
+
 using CamundaInsurance.Services.Insurance;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
@@ -47,7 +48,8 @@ namespace CamundaInsurance
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
             services.AddTransient<IdentityService>();
             services.AddTransient<InsuranceManager>();
-            services.AddSingleton(new CamundaProcessStarter());
+            services.AddTransient(v => CamundaClient.Create($"http://{Environment.GetEnvironmentVariable("CAMUNDA_URL") ?? "localhost:8080"}/engine-rest"));
+            
             services.AddDatabaseDeveloperPageExceptionFilter();
 
             services.AddExternalTaskClient()

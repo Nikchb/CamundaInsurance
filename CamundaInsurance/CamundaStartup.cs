@@ -48,6 +48,12 @@ namespace CamundaInsurance
                     changedOnly: true,
                     deploymentSource: "WebApp",
                     resources: new ResourceDataContent(File.OpenRead("BusinessProcesses/InsuranceRequestHandling.bpmn"), "InsuranceRequestHandling.bpmn"));
+            await camundaClient.Deployments.Create(
+                   deploymentName: "InsuranceRequestHandling",
+                   duplicateFiltering: true,
+                   changedOnly: true,
+                   deploymentSource: "WebApp",
+                   resources: new ResourceDataContent(File.OpenRead("BusinessProcesses/RiskCalculation.dmn"), "RiskCalculation.dmn"));
 
             using (var httpClient = new HttpClient())
             {
