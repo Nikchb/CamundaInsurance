@@ -15,7 +15,6 @@
         <bpmn:flowNodeRef>DefineRejectionReason</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>SendRejectionToCustomer</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>EndInsuranceRejected</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>DefinePreExistingConditionsCategory</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Gateway_10bsnpq</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Gateway_0tfqkdd</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>CalculateAge</bpmn:flowNodeRef>
@@ -314,11 +313,6 @@ execution.setVariable("rate", rate);</bpmn:script>
               <camunda:constraint name="readonly" />
             </camunda:validation>
           </camunda:formField>
-          <camunda:formField id="preExistingConditions" label="Pre-existing conditions" type="string">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
           <camunda:formField id="applicationComplete" label="Application complete" type="boolean" />
           <camunda:formField id="reason" label="Deny reason" type="string" />
         </camunda:formData>
@@ -333,57 +327,8 @@ execution.setVariable("rate", rate);</bpmn:script>
       <bpmn:outgoing>ApplicationIncomplete</bpmn:outgoing>
       <bpmn:outgoing>ApplicationComplete</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:userTask id="DefinePreExistingConditionsCategory" name="Define pre-existing conditions category" camunda:candidateGroups="insuranceOfficers">
-      <bpmn:extensionElements>
-        <camunda:formData>
-          <camunda:formField id="surname" label="Surname" type="string">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="name" label="Name" type="string">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="birthDate" label="Date of birth" type="date">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="gender" label="Gender" type="string">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="height" label="Height" type="long">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="weight" label="Weight" type="long">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="preExistingConditions" label="Pre-existing conditions" type="string">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="riskCategory" label="Risk category" type="enum">
-            <camunda:value id="C0" name="No critical pre-existing conditions" />
-            <camunda:value id="C1" name="Risk category 1" />
-            <camunda:value id="C2" name="Risk category 2" />
-            <camunda:value id="C3" name="Risk category 3" />
-          </camunda:formField>
-        </camunda:formData>
-      </bpmn:extensionElements>
-      <bpmn:incoming>ApplicationComplete</bpmn:incoming>
-      <bpmn:outgoing>Flow_0n2j8mu</bpmn:outgoing>
-    </bpmn:userTask>
     <bpmn:parallelGateway id="Gateway_10bsnpq">
-      <bpmn:incoming>Flow_0n2j8mu</bpmn:incoming>
+      <bpmn:incoming>ApplicationComplete</bpmn:incoming>
       <bpmn:outgoing>Flow_1fidasb</bpmn:outgoing>
       <bpmn:outgoing>Flow_1tkvy41</bpmn:outgoing>
       <bpmn:outgoing>Flow_0ygci78</bpmn:outgoing>
@@ -445,8 +390,16 @@ execution.setVariable("bmi", bmi);</bpmn:script>
           <camunda:formField id="insuranceStartDate" label="Insurance start date" type="date" />
           <camunda:formField id="height" label="Height" type="long" />
           <camunda:formField id="weight" label="Weight" type="long" />
-          <camunda:formField id="preExistingConditions" label="Pre-existing conditions" type="string" />
           <camunda:formField id="isExistingCustomer" label="Is existing customer" type="boolean" />
+          <camunda:formField id="disease1RC1" label="Do you have chronical bronchitis?" type="boolean" />
+          <camunda:formField id="disease2RC1" label="Do you have dermatitis?" type="boolean" />
+          <camunda:formField id="disease3RC1" label="Do you have allergy?" type="boolean" />
+          <camunda:formField id="disease1RC2" label="Do you have asthma?" type="boolean" />
+          <camunda:formField id="disease2RC2" label="Do you have migraine?" type="boolean" />
+          <camunda:formField id="disease3RC2" label="Do you have scoliosis?" type="boolean" />
+          <camunda:formField id="disease1RC3" label="Do you have any type of cancer?" type="boolean" />
+          <camunda:formField id="disease2RC3" label="Do you have heart problems?" type="boolean" />
+          <camunda:formField id="disease3RC3" label="Have you ever had a stroke?" type="boolean" />
         </camunda:formData>
       </bpmn:extensionElements>
       <bpmn:outgoing>Flow_1iuymyk</bpmn:outgoing>
@@ -490,7 +443,7 @@ execution.setVariable("bmi", bmi);</bpmn:script>
     <bpmn:sequenceFlow id="Flow_0ctprhz" name="Premium tariff" sourceRef="Gateway_2" targetRef="DefineDecisionForPremiumTariff">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${tariff == "Premium"}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="ApplicationComplete" name="Application complete" sourceRef="Getaway_1" targetRef="DefinePreExistingConditionsCategory">
+    <bpmn:sequenceFlow id="ApplicationComplete" name="Application complete" sourceRef="Getaway_1" targetRef="Gateway_10bsnpq">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${applicationComplete == true}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="ApplicationIncomplete" name="Application incomplete" sourceRef="Getaway_1" targetRef="InstuctionSentToCustomer">
@@ -500,7 +453,6 @@ execution.setVariable("bmi", bmi);</bpmn:script>
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${applicationComplete == false and (reason == '' or reason == null)}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_1cog3v9" sourceRef="CheckedApplicationForCompleteness" targetRef="Getaway_1" />
-    <bpmn:sequenceFlow id="Flow_0n2j8mu" sourceRef="DefinePreExistingConditionsCategory" targetRef="Gateway_10bsnpq" />
     <bpmn:sequenceFlow id="Flow_1fidasb" sourceRef="Gateway_10bsnpq" targetRef="CalculateAge" />
     <bpmn:sequenceFlow id="Flow_1phhzr5" sourceRef="CalculateAge" targetRef="CalculateAgeRiskFactor" />
     <bpmn:sequenceFlow id="Flow_0zslrip" sourceRef="CalculateAgeRiskFactor" targetRef="Gateway_0tfqkdd" />
@@ -561,8 +513,16 @@ execution.setVariable("bmi", bmi);</bpmn:script>
           <camunda:formField id="insuranceStartDate" label="Insurance start date" type="date" />
           <camunda:formField id="height" label="Height" type="long" />
           <camunda:formField id="weight" label="Weight" type="long" />
-          <camunda:formField id="preExistingConditions" label="Pre-existing conditions" type="string" />
           <camunda:formField id="isExistingCustomer" label="Is existing customer" type="boolean" />
+          <camunda:formField id="disease1RC1" label="Do you have chronical bronchitis?" type="boolean" />
+          <camunda:formField id="disease2RC1" label="Do you have dermatitis?" type="boolean" />
+          <camunda:formField id="disease3RC1" label="Do you have allergy?" type="boolean" />
+          <camunda:formField id="disease1RC2" label="Do you have asthma?" type="boolean" />
+          <camunda:formField id="disease2RC2" label="Do you have migraine?" type="boolean" />
+          <camunda:formField id="disease3RC2" label="Do you have scoliosis?" type="boolean" />
+          <camunda:formField id="disease1RC3" label="Do you have any type of cancer?" type="boolean" />
+          <camunda:formField id="disease2RC3" label="Do you have heart problems?" type="boolean" />
+          <camunda:formField id="disease3RC3" label="Have you ever had a stroke?" type="boolean" />
         </camunda:formData>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_1dfgevv</bpmn:incoming>
@@ -625,10 +585,6 @@ execution.setVariable("bmi", bmi);</bpmn:script>
         <di:waypoint x="1070" y="730" />
         <di:waypoint x="1130" y="730" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0n2j8mu_di" bpmnElement="Flow_0n2j8mu">
-        <di:waypoint x="1000" y="820" />
-        <di:waypoint x="1045" y="820" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1cog3v9_di" bpmnElement="Flow_1cog3v9">
         <di:waypoint x="660" y="560" />
         <di:waypoint x="775" y="560" />
@@ -652,11 +608,11 @@ execution.setVariable("bmi", bmi);</bpmn:script>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1qrr293_di" bpmnElement="ApplicationComplete">
         <di:waypoint x="825" y="560" />
-        <di:waypoint x="860" y="560" />
-        <di:waypoint x="860" y="820" />
-        <di:waypoint x="900" y="820" />
+        <di:waypoint x="880" y="560" />
+        <di:waypoint x="880" y="820" />
+        <di:waypoint x="1045" y="820" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="864" y="619" width="54" height="27" />
+          <dc:Bounds x="893" y="696" width="54" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0ctprhz_di" bpmnElement="Flow_0ctprhz">
@@ -825,9 +781,6 @@ execution.setVariable("bmi", bmi);</bpmn:script>
           <dc:Bounds x="591" y="226" width="87" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1dj22rf_di" bpmnElement="DefinePreExistingConditionsCategory">
-        <dc:Bounds x="900" y="780" width="100" height="80" />
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_0cqsedw_di" bpmnElement="Gateway_10bsnpq">
         <dc:Bounds x="1045" y="795" width="50" height="50" />
       </bpmndi:BPMNShape>
@@ -873,6 +826,10 @@ execution.setVariable("bmi", bmi);</bpmn:script>
       <bpmndi:BPMNShape id="Participant_1xuhayc_di" bpmnElement="Participant_1xuhayc" isHorizontal="true">
         <dc:Bounds x="130" y="120" width="3265" height="230" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1a0qszs_di" bpmnElement="Flow_1a0qszs">
+        <di:waypoint x="380" y="240" />
+        <di:waypoint x="442" y="240" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1dfgevv_di" bpmnElement="Flow_1dfgevv">
         <di:waypoint x="218" y="240" />
         <di:waypoint x="280" y="240" />
@@ -885,15 +842,14 @@ execution.setVariable("bmi", bmi);</bpmn:script>
         <di:waypoint x="1090" y="240" />
         <di:waypoint x="1142" y="240" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1a0qszs_di" bpmnElement="Flow_1a0qszs">
-        <di:waypoint x="380" y="240" />
-        <di:waypoint x="442" y="240" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Event_109lw7b_di" bpmnElement="Start">
-        <dc:Bounds x="182" y="222" width="36" height="36" />
+      <bpmndi:BPMNShape id="Event_14f8gr3_di" bpmnElement="Event_14f8gr3">
+        <dc:Bounds x="1142" y="222" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="188" y="265" width="25" height="14" />
+          <dc:Bounds x="1150" y="265" width="20" height="14" />
         </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0dy8zbb_di" bpmnElement="ReadInsruction">
+        <dc:Bounds x="990" y="200" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0jfzr82_di" bpmnElement="InstuctionReceived">
         <dc:Bounds x="892" y="222" width="36" height="36" />
@@ -901,13 +857,10 @@ execution.setVariable("bmi", bmi);</bpmn:script>
           <dc:Bounds x="887" y="192" width="48" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0dy8zbb_di" bpmnElement="ReadInsruction">
-        <dc:Bounds x="990" y="200" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_14f8gr3_di" bpmnElement="Event_14f8gr3">
-        <dc:Bounds x="1142" y="222" width="36" height="36" />
+      <bpmndi:BPMNShape id="Event_109lw7b_di" bpmnElement="Start">
+        <dc:Bounds x="182" y="222" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1150" y="265" width="20" height="14" />
+          <dc:Bounds x="188" y="265" width="25" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0zn5le4_di" bpmnElement="SendInsuranceApplicationForm">
