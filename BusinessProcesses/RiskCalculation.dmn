@@ -172,51 +172,51 @@
   <decision id="DefineHealthHistoryRiskFactor" name="Define health history risk factor">
     <decisionTable id="DecisionTable_04jwdda" hitPolicy="FIRST">
       <input id="InputClause_0yxkc5r" biodi:width="150">
-        <inputExpression id="LiteralExpression_0d0for7" typeRef="string">
+        <inputExpression id="LiteralExpression_0d0for7" typeRef="boolean">
           <text>disease1RC3</text>
         </inputExpression>
       </input>
       <input id="InputClause_1kudclo" biodi:width="150">
-        <inputExpression id="LiteralExpression_0ufbwpr" typeRef="string">
+        <inputExpression id="LiteralExpression_0ufbwpr" typeRef="boolean">
           <text>disease2RC3</text>
         </inputExpression>
       </input>
       <input id="InputClause_0urlnpz" biodi:width="150">
-        <inputExpression id="LiteralExpression_0psyrsy" typeRef="string">
+        <inputExpression id="LiteralExpression_0psyrsy" typeRef="boolean">
           <text>disease3RC3</text>
         </inputExpression>
       </input>
       <input id="InputClause_10kngnj" biodi:width="150">
-        <inputExpression id="LiteralExpression_0uq5c7f" typeRef="string">
+        <inputExpression id="LiteralExpression_0uq5c7f" typeRef="boolean">
           <text>disease1RC2</text>
         </inputExpression>
       </input>
       <input id="InputClause_0qelkgb" biodi:width="150">
-        <inputExpression id="LiteralExpression_0xrnbl4" typeRef="string">
+        <inputExpression id="LiteralExpression_0xrnbl4" typeRef="boolean">
           <text>disease2RC2</text>
         </inputExpression>
       </input>
       <input id="InputClause_0orour4" biodi:width="150">
-        <inputExpression id="LiteralExpression_142rolv" typeRef="string">
+        <inputExpression id="LiteralExpression_142rolv" typeRef="boolean">
           <text>disease3RC2</text>
         </inputExpression>
       </input>
       <input id="InputClause_163xc3i" biodi:width="150">
-        <inputExpression id="LiteralExpression_04sjanx" typeRef="string">
+        <inputExpression id="LiteralExpression_04sjanx" typeRef="boolean">
           <text>disease1RC1</text>
         </inputExpression>
       </input>
       <input id="InputClause_1kqe52x" biodi:width="150">
-        <inputExpression id="LiteralExpression_1gsfxyw" typeRef="string">
+        <inputExpression id="LiteralExpression_1gsfxyw" typeRef="boolean">
           <text>disease2RC1</text>
         </inputExpression>
       </input>
       <input id="InputClause_0l2cclg" biodi:width="150">
-        <inputExpression id="LiteralExpression_1tnnko3" typeRef="string">
+        <inputExpression id="LiteralExpression_1tnnko3" typeRef="boolean">
           <text>disease3RC1</text>
         </inputExpression>
       </input>
-      <output id="OutputClause_1ttdiqs" label="Health history risk factor" name="healthHistoryRiskFactor" typeRef="integer" biodi:width="254.75999450683594" />
+      <output id="OutputClause_1ttdiqs" label="Health history risk factor" name="healthHistoryRiskFactor" typeRef="integer" biodi:width="254" />
       <rule id="DecisionRule_1t80ea2">
         <inputEntry id="UnaryTests_1ld2jtf">
           <text>true</text>
@@ -535,6 +535,38 @@
         </inputEntry>
         <outputEntry id="LiteralExpression_1rsnest">
           <text>0</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1j74lzq">
+        <inputEntry id="UnaryTests_1vhwo0v">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1che1d1">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_045mju3">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1de2cio">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_15byba0">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1c174t6">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_00omwuh">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0y8d7sh">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0wby78n">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1nabvj7">
+          <text></text>
         </outputEntry>
       </rule>
     </decisionTable>
