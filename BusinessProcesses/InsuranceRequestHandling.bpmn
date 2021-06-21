@@ -5,6 +5,8 @@
     <bpmn:participant id="Participant_1xuhayc" name="Customer" processRef="SendInsuranceRequest" />
     <bpmn:messageFlow id="Flow_1pd5bil" sourceRef="InstuctionSentToCustomer" targetRef="InstuctionReceived" />
     <bpmn:messageFlow id="Flow_07vw05p" sourceRef="SendInsuranceApplicationForm" targetRef="InsuranceApplicationFormReceived" />
+    <bpmn:messageFlow id="Flow_0p2i2bv" sourceRef="SendRejectionReasonToCustomer" targetRef="Event_1jfd8yu" />
+    <bpmn:messageFlow id="Flow_19gi837" sourceRef="Event_0uruaby" targetRef="Event_05rrp55" />
   </bpmn:collaboration>
   <bpmn:process id="InsuranceRequestHandling" name="InsuranceRequestHandling" isExecutable="true">
     <bpmn:laneSet id="LaneSet_1q4ny1n">
@@ -13,8 +15,6 @@
         <bpmn:flowNodeRef>Gateway_3</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Gateway_4</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>DefineRejectionReason</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>SendRejectionToCustomer</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>EndInsuranceRejected</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Gateway_10bsnpq</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Gateway_0tfqkdd</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>CalculateAge</bpmn:flowNodeRef>
@@ -24,6 +24,7 @@
         <bpmn:flowNodeRef>DefineHealthHistoryRiskFactor</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Gateway_2</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>DefineDecisionForPremiumTariff</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>SendRejectionReasonToCustomer</bpmn:flowNodeRef>
         <bpmn:childLaneSet id="LaneSet_04acobg" />
       </bpmn:lane>
       <bpmn:lane id="Lane_111ejh0" name="Head of the underwriting department">
@@ -31,20 +32,15 @@
         <bpmn:flowNodeRef>Gateway_5</bpmn:flowNodeRef>
       </bpmn:lane>
       <bpmn:lane id="Lane_03vj88f" name="Underwriting clerk">
-        <bpmn:flowNodeRef>InsuranceApproved</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>CheckedInsurancePolicyInformation</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>EndInsuranceApproved</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>CheckedApplicationForCompleteness</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Getaway_1</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>InsuranceApplicationFormReceived</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>InstuctionSentToCustomer</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Event_0uruaby</bpmn:flowNodeRef>
         <bpmn:childLaneSet id="LaneSet_1gxu9a6" />
       </bpmn:lane>
     </bpmn:laneSet>
-    <bpmn:serviceTask id="InsuranceApproved" name="Send insurance policy to customer" camunda:type="external" camunda:topic="insuranceApprove">
-      <bpmn:incoming>Flow_0mlek94</bpmn:incoming>
-      <bpmn:outgoing>Flow_0gk7kxt</bpmn:outgoing>
-    </bpmn:serviceTask>
     <bpmn:userTask id="CheckedInsurancePolicyInformation" name="Check insurance policy information" camunda:candidateGroups="underwritingClerks">
       <bpmn:extensionElements>
         <camunda:formData>
@@ -91,11 +87,8 @@
         </camunda:formData>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_10r5mw0</bpmn:incoming>
-      <bpmn:outgoing>Flow_0mlek94</bpmn:outgoing>
+      <bpmn:outgoing>Flow_02wobcz</bpmn:outgoing>
     </bpmn:userTask>
-    <bpmn:endEvent id="EndInsuranceApproved" name="End insurance approved">
-      <bpmn:incoming>Flow_0gk7kxt</bpmn:incoming>
-    </bpmn:endEvent>
     <bpmn:scriptTask id="RateCalculation" name="Calculate monthly insurance rate" scriptFormat="JavaScript">
       <bpmn:incoming>Flow_1pqsw4x</bpmn:incoming>
       <bpmn:incoming>Flow_03nnhd7</bpmn:incoming>
@@ -147,11 +140,6 @@ execution.setVariable("rate", rate);</bpmn:script>
             </camunda:validation>
           </camunda:formField>
           <camunda:formField id="weight" label="Weight" type="long">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="preExistingConditions" label="Pre-existing conditions" type="string">
             <camunda:validation>
               <camunda:constraint name="readonly" />
             </camunda:validation>
@@ -230,11 +218,6 @@ execution.setVariable("rate", rate);</bpmn:script>
               <camunda:constraint name="readonly" />
             </camunda:validation>
           </camunda:formField>
-          <camunda:formField id="preExistingConditions" label="Pre-existing conditions" type="string">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
           <camunda:formField id="ageRiskFactor" label="Age risk factor" type="long">
             <camunda:validation>
               <camunda:constraint name="readonly" />
@@ -257,14 +240,6 @@ execution.setVariable("rate", rate);</bpmn:script>
       <bpmn:incoming>Flow_0zhv5ed</bpmn:incoming>
       <bpmn:outgoing>Flow_14hikcw</bpmn:outgoing>
     </bpmn:userTask>
-    <bpmn:serviceTask id="SendRejectionToCustomer" name="Send decision and rejection reason to customer" camunda:type="external" camunda:topic="insuranceDeny">
-      <bpmn:incoming>Flow_0ivup4z</bpmn:incoming>
-      <bpmn:incoming>Flow_0kjikel</bpmn:incoming>
-      <bpmn:outgoing>Flow_1qupupl</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:endEvent id="EndInsuranceRejected" name="End insurance rejected">
-      <bpmn:incoming>Flow_1qupupl</bpmn:incoming>
-    </bpmn:endEvent>
     <bpmn:userTask id="CheckedApplicationForCompleteness" name="Check application for completeness" camunda:candidateGroups="underwritingClerks">
       <bpmn:extensionElements>
         <camunda:formData>
@@ -406,11 +381,10 @@ execution.setVariable("bmi", bmi);</bpmn:script>
       <bpmn:messageEventDefinition id="MessageEventDefinition_1jiapzg" messageRef="Message_1xmpkdf" />
     </bpmn:startEvent>
     <bpmn:sequenceFlow id="Flow_1iuymyk" sourceRef="InsuranceApplicationFormReceived" targetRef="CheckedApplicationForCompleteness" />
-    <bpmn:sequenceFlow id="Flow_0kjikel" name="Not eligible for insurance" sourceRef="Gateway_5" targetRef="SendRejectionToCustomer">
+    <bpmn:sequenceFlow id="Flow_0kjikel" name="Not eligible for insurance" sourceRef="Gateway_5" targetRef="SendRejectionReasonToCustomer">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${eligible == false and reason != '' and reason != null }</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_1qupupl" sourceRef="SendRejectionToCustomer" targetRef="EndInsuranceRejected" />
-    <bpmn:sequenceFlow id="Flow_0ivup4z" name="Rejection reason defined" sourceRef="Gateway_4" targetRef="SendRejectionToCustomer">
+    <bpmn:sequenceFlow id="Flow_0ivup4z" name="Rejection reason defined" sourceRef="Gateway_4" targetRef="SendRejectionReasonToCustomer">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${reason != '' and reason != null }</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_0zhv5ed" name="Rejection reason not defined" sourceRef="Gateway_4" targetRef="DefineRejectionReason">
@@ -423,8 +397,6 @@ execution.setVariable("bmi", bmi);</bpmn:script>
     <bpmn:sequenceFlow id="Flow_0vrg2ts" name="Eligible for insurance" sourceRef="Gateway_3" targetRef="RateCalculation">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${premiumTariffDecision == "EligibleForInsurance"}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_0gk7kxt" sourceRef="InsuranceApproved" targetRef="EndInsuranceApproved" />
-    <bpmn:sequenceFlow id="Flow_0mlek94" sourceRef="CheckedInsurancePolicyInformation" targetRef="InsuranceApproved" />
     <bpmn:sequenceFlow id="Flow_10r5mw0" sourceRef="RateCalculation" targetRef="CheckedInsurancePolicyInformation" />
     <bpmn:sequenceFlow id="Flow_03nnhd7" name="Eligible for insurance" sourceRef="Gateway_5" targetRef="RateCalculation">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${eligible == true}</bpmn:conditionExpression>
@@ -466,35 +438,60 @@ execution.setVariable("bmi", bmi);</bpmn:script>
       <bpmn:incoming>ApplicationIncomplete</bpmn:incoming>
       <bpmn:messageEventDefinition id="MessageEventDefinition_1drzxgr" messageRef="Message_0u3enr9" camunda:expression="${execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation(&#34;Instuction&#34;).processInstanceId(processId).setVariable(&#34;reason&#34;, reason).correlateWithResult()}" />
     </bpmn:endEvent>
+    <bpmn:endEvent id="SendRejectionReasonToCustomer" name="Send rejection reason to customer">
+      <bpmn:incoming>Flow_0ivup4z</bpmn:incoming>
+      <bpmn:incoming>Flow_0kjikel</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0bxeexe" messageRef="Message_0vjzrjl" camunda:expression="${execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation(&#34;Rejection&#34;).processInstanceId(processId).setVariable(&#34;reason&#34;, reason).correlateWithResult()}" />
+    </bpmn:endEvent>
+    <bpmn:endEvent id="Event_0uruaby" name="Send rejection reason to customer">
+      <bpmn:incoming>Flow_02wobcz</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1pvt00g" messageRef="Message_0zzgew5" camunda:expression="${execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation(&#34;Approval&#34;).processInstanceId(processId).setVariable(&#34;rate&#34;, rate).correlateWithResult()}" />
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_02wobcz" sourceRef="CheckedInsurancePolicyInformation" targetRef="Event_0uruaby" />
   </bpmn:process>
   <bpmn:process id="SendInsuranceRequest" name="Send insurance request" isExecutable="true">
-    <bpmn:sequenceFlow id="Flow_0v7tjx7" sourceRef="ReadInsruction" targetRef="Event_14f8gr3" />
-    <bpmn:sequenceFlow id="Flow_19450wr" sourceRef="InstuctionReceived" targetRef="ReadInsruction" />
+    <bpmn:sequenceFlow id="Flow_051cxlc" sourceRef="Event_05rrp55" targetRef="InsuranceApplicationApproved" />
+    <bpmn:sequenceFlow id="Flow_1r1xxyd" sourceRef="InsuranceApplicationApproved" targetRef="Event_1fckhpi" />
+    <bpmn:sequenceFlow id="Flow_1djbgpc" sourceRef="InsuranceAapplicationRejected" targetRef="Event_1uz06kz" />
+    <bpmn:sequenceFlow id="Flow_1gxhao4" sourceRef="Event_1jfd8yu" targetRef="InsuranceAapplicationRejected" />
+    <bpmn:sequenceFlow id="Flow_0v7tjx7" sourceRef="InsuranceApplicationIncomplete" targetRef="Event_14f8gr3" />
+    <bpmn:sequenceFlow id="Flow_19450wr" sourceRef="InstuctionReceived" targetRef="InsuranceApplicationIncomplete" />
     <bpmn:sequenceFlow id="Flow_1dfgevv" sourceRef="Start" targetRef="FillInsuranceApplicationForm" />
-    <bpmn:endEvent id="Event_14f8gr3" name="End">
-      <bpmn:incoming>Flow_0v7tjx7</bpmn:incoming>
-    </bpmn:endEvent>
-    <bpmn:userTask id="ReadInsruction" name="Read insruction">
+    <bpmn:sequenceFlow id="Flow_1a0qszs" sourceRef="FillInsuranceApplicationForm" targetRef="SendInsuranceApplicationForm" />
+    <bpmn:userTask id="InsuranceApplicationApproved" name="Insurance application approved">
       <bpmn:extensionElements>
         <camunda:formData>
-          <camunda:formField id="reason" label="Please submit insurance application again with following information:" type="string" />
+          <camunda:formField id="rate" label="Insurance monsly rate:" type="string" />
         </camunda:formData>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_19450wr</bpmn:incoming>
-      <bpmn:outgoing>Flow_0v7tjx7</bpmn:outgoing>
+      <bpmn:incoming>Flow_051cxlc</bpmn:incoming>
+      <bpmn:outgoing>Flow_1r1xxyd</bpmn:outgoing>
     </bpmn:userTask>
-    <bpmn:intermediateCatchEvent id="InstuctionReceived" name="Instuction received">
-      <bpmn:outgoing>Flow_19450wr</bpmn:outgoing>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_1dldim5" messageRef="Message_0u3enr9" />
+    <bpmn:endEvent id="Event_1fckhpi" name="End">
+      <bpmn:incoming>Flow_1r1xxyd</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:intermediateCatchEvent id="Event_05rrp55" name="Instuction received">
+      <bpmn:incoming>Flow_0qebo3s</bpmn:incoming>
+      <bpmn:outgoing>Flow_051cxlc</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0i5ke95" messageRef="Message_0zzgew5" />
     </bpmn:intermediateCatchEvent>
-    <bpmn:startEvent id="Start" name="Start">
-      <bpmn:outgoing>Flow_1dfgevv</bpmn:outgoing>
-    </bpmn:startEvent>
-    <bpmn:intermediateThrowEvent id="SendInsuranceApplicationForm" name="Send insurance application form">
-      <bpmn:incoming>Flow_1a0qszs</bpmn:incoming>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_1vg4k4p" messageRef="Message_1xmpkdf" camunda:expression="${execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation(&#34;InsuranceApplicationForm&#34;).setVariables(execution.getVariables()).setVariable(&#34;processId&#34;, execution.getProcessInstanceId()).correlateWithResult()}" />
-    </bpmn:intermediateThrowEvent>
-    <bpmn:sequenceFlow id="Flow_1a0qszs" sourceRef="FillInsuranceApplicationForm" targetRef="SendInsuranceApplicationForm" />
+    <bpmn:endEvent id="Event_1uz06kz" name="End">
+      <bpmn:incoming>Flow_1djbgpc</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:userTask id="InsuranceAapplicationRejected" name="Insurance application rejected">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="reason" label="Insurance application rejection reason:" type="string" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1gxhao4</bpmn:incoming>
+      <bpmn:outgoing>Flow_1djbgpc</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:intermediateCatchEvent id="Event_1jfd8yu" name="Instuction received">
+      <bpmn:incoming>Flow_03v94ss</bpmn:incoming>
+      <bpmn:outgoing>Flow_1gxhao4</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_030se8l" messageRef="Message_0vjzrjl" />
+    </bpmn:intermediateCatchEvent>
     <bpmn:userTask id="FillInsuranceApplicationForm" name="Fill insurance application form">
       <bpmn:extensionElements>
         <camunda:formData>
@@ -528,22 +525,54 @@ execution.setVariable("bmi", bmi);</bpmn:script>
       <bpmn:incoming>Flow_1dfgevv</bpmn:incoming>
       <bpmn:outgoing>Flow_1a0qszs</bpmn:outgoing>
     </bpmn:userTask>
+    <bpmn:intermediateThrowEvent id="SendInsuranceApplicationForm" name="Send insurance application form">
+      <bpmn:incoming>Flow_1a0qszs</bpmn:incoming>
+      <bpmn:outgoing>Flow_1krt3ny</bpmn:outgoing>
+      <bpmn:outgoing>Flow_03v94ss</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0qebo3s</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1vg4k4p" messageRef="Message_1xmpkdf" camunda:expression="${execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation(&#34;InsuranceApplicationForm&#34;).setVariables(execution.getVariables()).setVariable(&#34;processId&#34;, execution.getProcessInstanceId()).correlateWithResult()}" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:startEvent id="Start" name="Start">
+      <bpmn:outgoing>Flow_1dfgevv</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:intermediateCatchEvent id="InstuctionReceived" name="Instuction received">
+      <bpmn:incoming>Flow_1krt3ny</bpmn:incoming>
+      <bpmn:outgoing>Flow_19450wr</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1dldim5" messageRef="Message_0u3enr9" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:userTask id="InsuranceApplicationIncomplete" name="Insurance application incomplete">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="reason" label="Please submit insurance application again with following information:" type="string" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_19450wr</bpmn:incoming>
+      <bpmn:outgoing>Flow_0v7tjx7</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="Event_14f8gr3" name="End">
+      <bpmn:incoming>Flow_0v7tjx7</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1krt3ny" sourceRef="SendInsuranceApplicationForm" targetRef="InstuctionReceived" />
+    <bpmn:sequenceFlow id="Flow_03v94ss" sourceRef="SendInsuranceApplicationForm" targetRef="Event_1jfd8yu" />
+    <bpmn:sequenceFlow id="Flow_0qebo3s" sourceRef="SendInsuranceApplicationForm" targetRef="Event_05rrp55" />
   </bpmn:process>
   <bpmn:message id="Message_1xmpkdf" name="InsuranceApplicationForm" />
   <bpmn:message id="Message_0u3enr9" name="Instuction" />
+  <bpmn:message id="Message_0vjzrjl" name="Rejection" />
+  <bpmn:message id="Message_0zzgew5" name="Approval" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="InsuranceApplication">
       <bpmndi:BPMNShape id="Participant_0qv0tma_di" bpmnElement="Participant_0qv0tma" isHorizontal="true">
-        <dc:Bounds x="130" y="380" width="3265" height="800" />
+        <dc:Bounds x="130" y="380" width="3520" height="800" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Lane_03vj88f_di" bpmnElement="Lane_03vj88f" isHorizontal="true">
-        <dc:Bounds x="160" y="380" width="3235" height="290" />
+        <dc:Bounds x="160" y="380" width="3490" height="290" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Lane_111ejh0_di" bpmnElement="Lane_111ejh0" isHorizontal="true">
-        <dc:Bounds x="160" y="960" width="3235" height="220" />
+        <dc:Bounds x="160" y="960" width="3490" height="220" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Lane_0aulvib_di" bpmnElement="Lane_0aulvib" isHorizontal="true">
-        <dc:Bounds x="160" y="670" width="3235" height="290" />
+        <dc:Bounds x="160" y="670" width="3490" height="290" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_0ygci78_di" bpmnElement="Flow_0ygci78">
         <di:waypoint x="1070" y="845" />
@@ -671,14 +700,6 @@ execution.setVariable("bmi", bmi);</bpmn:script>
         <di:waypoint x="2895" y="520" />
         <di:waypoint x="2965" y="520" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0mlek94_di" bpmnElement="Flow_0mlek94">
-        <di:waypoint x="3065" y="520" />
-        <di:waypoint x="3145" y="520" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0gk7kxt_di" bpmnElement="Flow_0gk7kxt">
-        <di:waypoint x="3245" y="520" />
-        <di:waypoint x="3307" y="520" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0vrg2ts_di" bpmnElement="Flow_0vrg2ts">
         <di:waypoint x="1970" y="845" />
         <di:waypoint x="1970" y="750" />
@@ -691,7 +712,7 @@ execution.setVariable("bmi", bmi);</bpmn:script>
         <di:waypoint x="1995" y="870" />
         <di:waypoint x="2110" y="870" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1979" y="841" width="72" height="27" />
+          <dc:Bounds x="2004" y="841" width="72" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_14hikcw_di" bpmnElement="Flow_14hikcw">
@@ -709,38 +730,29 @@ execution.setVariable("bmi", bmi);</bpmn:script>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0ivup4z_di" bpmnElement="Flow_0ivup4z">
         <di:waypoint x="2315" y="870" />
-        <di:waypoint x="2420" y="870" />
+        <di:waypoint x="2442" y="870" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="2295" y="841" width="83" height="27" />
+          <dc:Bounds x="2328" y="841" width="83" height="27" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1qupupl_di" bpmnElement="Flow_1qupupl">
-        <di:waypoint x="2520" y="890" />
-        <di:waypoint x="2602" y="890" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0kjikel_di" bpmnElement="Flow_0kjikel">
         <di:waypoint x="2290" y="1050" />
         <di:waypoint x="2290" y="910" />
-        <di:waypoint x="2420" y="910" />
+        <di:waypoint x="2440" y="910" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="2319" y="916" width="72" height="27" />
+          <dc:Bounds x="2294" y="1016" width="72" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1iuymyk_di" bpmnElement="Flow_1iuymyk">
         <di:waypoint x="478" y="560" />
         <di:waypoint x="560" y="560" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Activity_0bwwzvj_di" bpmnElement="InsuranceApproved">
-        <dc:Bounds x="3145" y="480" width="100" height="80" />
-      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_02wobcz_di" bpmnElement="Flow_02wobcz">
+        <di:waypoint x="3065" y="520" />
+        <di:waypoint x="3162" y="520" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_17l95p7_di" bpmnElement="CheckedInsurancePolicyInformation">
         <dc:Bounds x="2965" y="480" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0tgkjza_di" bpmnElement="EndInsuranceApproved">
-        <dc:Bounds x="3307" y="502" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="3292" y="545" width="71" height="27" />
-        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0z2agk8_di" bpmnElement="RateCalculation">
         <dc:Bounds x="2775" y="710" width="100" height="80" />
@@ -762,15 +774,6 @@ execution.setVariable("bmi", bmi);</bpmn:script>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_06tk5fo_di" bpmnElement="DefineRejectionReason">
         <dc:Bounds x="2110" y="830" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0lpjq4g_di" bpmnElement="SendRejectionToCustomer">
-        <dc:Bounds x="2420" y="850" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1ingx1d_di" bpmnElement="EndInsuranceRejected">
-        <dc:Bounds x="2602" y="872" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="2587" y="915" width="71" height="27" />
-        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1fv5bun_di" bpmnElement="CheckedApplicationForCompleteness">
         <dc:Bounds x="560" y="520" width="100" height="80" />
@@ -823,8 +826,20 @@ execution.setVariable("bmi", bmi);</bpmn:script>
           <dc:Bounds x="871" y="465" width="84" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1vb5g3q_di" bpmnElement="SendRejectionReasonToCustomer">
+        <dc:Bounds x="2442" y="872" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2428" y="915" width="71" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0uruaby_di" bpmnElement="Event_0uruaby">
+        <dc:Bounds x="3162" y="502" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3148" y="545" width="71" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Participant_1xuhayc_di" bpmnElement="Participant_1xuhayc" isHorizontal="true">
-        <dc:Bounds x="130" y="120" width="3265" height="230" />
+        <dc:Bounds x="130" y="120" width="3520" height="230" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_1a0qszs_di" bpmnElement="Flow_1a0qszs">
         <di:waypoint x="380" y="240" />
@@ -842,13 +857,47 @@ execution.setVariable("bmi", bmi);</bpmn:script>
         <di:waypoint x="1090" y="240" />
         <di:waypoint x="1142" y="240" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1gxhao4_di" bpmnElement="Flow_1gxhao4">
+        <di:waypoint x="2478" y="240" />
+        <di:waypoint x="2540" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1djbgpc_di" bpmnElement="Flow_1djbgpc">
+        <di:waypoint x="2640" y="240" />
+        <di:waypoint x="2692" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1r1xxyd_di" bpmnElement="Flow_1r1xxyd">
+        <di:waypoint x="3360" y="240" />
+        <di:waypoint x="3432" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_051cxlc_di" bpmnElement="Flow_051cxlc">
+        <di:waypoint x="3198" y="240" />
+        <di:waypoint x="3260" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1krt3ny_di" bpmnElement="Flow_1krt3ny">
+        <di:waypoint x="478" y="240" />
+        <di:waypoint x="892" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_03v94ss_di" bpmnElement="Flow_03v94ss">
+        <di:waypoint x="480" y="230" />
+        <di:waypoint x="640" y="230" />
+        <di:waypoint x="640" y="180" />
+        <di:waypoint x="2460" y="180" />
+        <di:waypoint x="2460" y="222" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0qebo3s_di" bpmnElement="Flow_0qebo3s">
+        <di:waypoint x="480" y="220" />
+        <di:waypoint x="570" y="220" />
+        <di:waypoint x="570" y="160" />
+        <di:waypoint x="3180" y="160" />
+        <di:waypoint x="3180" y="222" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_14f8gr3_di" bpmnElement="Event_14f8gr3">
         <dc:Bounds x="1142" y="222" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="1150" y="265" width="20" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0dy8zbb_di" bpmnElement="ReadInsruction">
+      <bpmndi:BPMNShape id="Activity_0dy8zbb_di" bpmnElement="InsuranceApplicationIncomplete">
         <dc:Bounds x="990" y="200" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0jfzr82_di" bpmnElement="InstuctionReceived">
@@ -866,11 +915,41 @@ execution.setVariable("bmi", bmi);</bpmn:script>
       <bpmndi:BPMNShape id="Event_0zn5le4_di" bpmnElement="SendInsuranceApplicationForm">
         <dc:Bounds x="442" y="222" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="421" y="184.5" width="78" height="27" />
+          <dc:Bounds x="421" y="185" width="78" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0r2tf10_di" bpmnElement="FillInsuranceApplicationForm">
         <dc:Bounds x="280" y="200" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1jfd8yu_di" bpmnElement="Event_1jfd8yu">
+        <dc:Bounds x="2442" y="222" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2384" y="226" width="48" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0x0af4b_di" bpmnElement="InsuranceAapplicationRejected">
+        <dc:Bounds x="2540" y="200" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1uz06kz_di" bpmnElement="Event_1uz06kz">
+        <dc:Bounds x="2692" y="222" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2700" y="265" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_05rrp55_di" bpmnElement="Event_05rrp55">
+        <dc:Bounds x="3162" y="222" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3104" y="226" width="48" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1fckhpi_di" bpmnElement="Event_1fckhpi">
+        <dc:Bounds x="3432" y="222" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3440" y="265" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_05wr80k_di" bpmnElement="InsuranceApplicationApproved">
+        <dc:Bounds x="3260" y="200" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_1pd5bil_di" bpmnElement="Flow_1pd5bil">
         <di:waypoint x="910" y="422" />
@@ -879,6 +958,14 @@ execution.setVariable("bmi", bmi);</bpmn:script>
       <bpmndi:BPMNEdge id="Flow_07vw05p_di" bpmnElement="Flow_07vw05p">
         <di:waypoint x="460" y="258" />
         <di:waypoint x="460" y="542" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0p2i2bv_di" bpmnElement="Flow_0p2i2bv">
+        <di:waypoint x="2460" y="872" />
+        <di:waypoint x="2460" y="258" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_19gi837_di" bpmnElement="Flow_19gi837">
+        <di:waypoint x="3180" y="502" />
+        <di:waypoint x="3180" y="258" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
