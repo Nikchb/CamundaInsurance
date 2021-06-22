@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:biodi="http://bpmn.io/schema/dmn/biodi/2.0" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" id="RiskCalculation" name="Risk calculation" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="4.7.0">
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:biodi="http://bpmn.io/schema/dmn/biodi/2.0" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" xmlns:camunda="http://camunda.org/schema/1.0/dmn" id="RiskCalculation" name="Risk calculation" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="4.7.0">
   <decision id="DecisionForPremiumTariff" name="Define decision for premium tariff">
     <informationRequirement id="InformationRequirement_0i7nspn">
       <requiredDecision href="#DefineAgeRiskFactor" />
@@ -7,21 +7,21 @@
     <informationRequirement id="InformationRequirement_0lwd69a">
       <requiredDecision href="#DefineGeneralConditionsRiskFactor" />
     </informationRequirement>
-    <informationRequirement id="InformationRequirement_10glgc2">
+    <informationRequirement id="InformationRequirement_0hk94c9">
       <requiredDecision href="#DefineHealthHistoryRiskFactor" />
     </informationRequirement>
     <decisionTable id="DecisionTable_0ecgkxe" hitPolicy="FIRST">
-      <input id="Input_1" label="Age risk factor" biodi:width="150">
+      <input id="Input_1" label="Age risk factor" biodi:width="150" camunda:inputVariable="ageRiskFactor">
         <inputExpression id="InputExpression_1" typeRef="integer">
           <text>ageRiskFactor</text>
         </inputExpression>
       </input>
-      <input id="InputClause_1c7cp8o" label="General conditions risk factor" biodi:width="247">
+      <input id="InputClause_1c7cp8o" label="General conditions risk factor" biodi:width="247" camunda:inputVariable="generalConditionsRiskFactor">
         <inputExpression id="LiteralExpression_15aivt8" typeRef="integer">
           <text>generalConditionsRiskFactor</text>
         </inputExpression>
       </input>
-      <input id="InputClause_0ddydd3" label="Health history risk factor" biodi:width="313">
+      <input id="InputClause_0ddydd3" label="Health history risk factor" biodi:width="313" camunda:inputVariable="healthHistoryRiskFactor">
         <inputExpression id="LiteralExpression_0k6o1xf" typeRef="integer">
           <text>healthHistoryRiskFactor</text>
         </inputExpression>
@@ -572,6 +572,9 @@
     </decisionTable>
   </decision>
   <decision id="DefineAgeRiskFactor" name="Define age risk factor">
+    <informationRequirement id="InformationRequirement_0nnb8re">
+      <requiredDecision href="#CalculateAge" />
+    </informationRequirement>
     <decisionTable id="DecisionTable_1uzus7x">
       <input id="InputClause_177wav3" label="Age">
         <inputExpression id="LiteralExpression_11lq5r8" typeRef="integer">
@@ -622,6 +625,9 @@
     </decisionTable>
   </decision>
   <decision id="DefineGeneralConditionsRiskFactor" name="Define general conditions risk factor">
+    <informationRequirement id="InformationRequirement_1mtbspn">
+      <requiredDecision href="#CalculateBMI" />
+    </informationRequirement>
     <decisionTable id="DecisionTable_1vv0eqd">
       <input id="InputClause_1apux07" label="BMI">
         <inputExpression id="LiteralExpression_1uor6u5" typeRef="integer">
@@ -671,6 +677,18 @@
       </rule>
     </decisionTable>
   </decision>
+  <decision id="CalculateAge" name="Calculate age">
+    <variable id="InformationItem_0b3ionl" name="age" typeRef="long" />
+    <literalExpression id="LiteralExpression_0rqzoaf" expressionLanguage="feel">
+      <text>years and months duration(date(birthDate), today()).years</text>
+    </literalExpression>
+  </decision>
+  <decision id="CalculateBMI" name="Calculate BMI">
+    <variable id="InformationItem_1nekwts" name="bmi" typeRef="long" />
+    <literalExpression id="LiteralExpression_0cuejjh" expressionLanguage="feel">
+      <text>decimal(100 * 100 * weight / (height * height), 0) </text>
+    </literalExpression>
+  </decision>
   <dmndi:DMNDI>
     <dmndi:DMNDiagram>
       <dmndi:DMNShape dmnElementRef="DecisionForPremiumTariff">
@@ -695,7 +713,23 @@
         <di:waypoint x="490" y="190" />
         <di:waypoint x="490" y="170" />
       </dmndi:DMNEdge>
-      <dmndi:DMNEdge id="DMNEdge_1wx5q7o" dmnElementRef="InformationRequirement_10glgc2">
+      <dmndi:DMNEdge id="DMNEdge_0m02alt" dmnElementRef="InformationRequirement_0nnb8re">
+        <di:waypoint x="250" y="440" />
+        <di:waypoint x="250" y="380" />
+        <di:waypoint x="250" y="360" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNShape id="DMNShape_1y7fpwk" dmnElementRef="CalculateAge">
+        <dc:Bounds height="80" width="180" x="160" y="440" />
+      </dmndi:DMNShape>
+      <dmndi:DMNEdge id="DMNEdge_17p4k7d" dmnElementRef="InformationRequirement_1mtbspn">
+        <di:waypoint x="490" y="440" />
+        <di:waypoint x="490" y="380" />
+        <di:waypoint x="490" y="360" />
+      </dmndi:DMNEdge>
+      <dmndi:DMNShape id="DMNShape_1248y0j" dmnElementRef="CalculateBMI">
+        <dc:Bounds height="80" width="180" x="400" y="440" />
+      </dmndi:DMNShape>
+      <dmndi:DMNEdge id="DMNEdge_0p5ufjp" dmnElementRef="InformationRequirement_0hk94c9">
         <di:waypoint x="740" y="280" />
         <di:waypoint x="535" y="190" />
         <di:waypoint x="535" y="170" />
