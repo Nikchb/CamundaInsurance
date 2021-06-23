@@ -49,7 +49,7 @@ namespace CamundaInsurance
                     deploymentSource: "WebApp",
                     resources: new ResourceDataContent(File.OpenRead("BusinessProcesses/InsuranceRequestHandling.bpmn"), "InsuranceRequestHandling.bpmn"));
             await camundaClient.Deployments.Create(
-                   deploymentName: "InsuranceRequestHandling",
+                   deploymentName: "RiskCalculation",
                    duplicateFiltering: true,
                    changedOnly: true,
                    deploymentSource: "WebApp",
