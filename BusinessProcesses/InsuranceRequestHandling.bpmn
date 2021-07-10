@@ -8,50 +8,52 @@
     <bpmn:messageFlow id="Flow_07vw05p" sourceRef="SendInsuranceApplicationForm" targetRef="InsuranceApplicationFormReceived" />
     <bpmn:messageFlow id="Flow_0p2i2bv" sourceRef="RejectionReasonSentToCustomer" targetRef="InsuranceRejected" />
     <bpmn:messageFlow id="Flow_0wgpejc" sourceRef="PolicyConfirmed" targetRef="PolicyRemainsValid" />
-    <bpmn:messageFlow id="Flow_06qdqho" sourceRef="SendInsuranceInformationToCustomer" targetRef="InsuranceApproved" />
+    <bpmn:messageFlow id="Flow_0byzm51" sourceRef="SendInsuranceInformationToCustomer" targetRef="InsuranceApproved" />
   </bpmn:collaboration>
   <bpmn:process id="InsuranceRequestHandling" name="InsuranceRequestHandling" isExecutable="true">
     <bpmn:laneSet id="LaneSet_1q4ny1n">
       <bpmn:lane id="Lane_03vj88f" name="Underwriting clerk">
-        <bpmn:flowNodeRef>CheckedApplicationForCompleteness</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Getaway_1</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>InsuranceApplicationFormReceived</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>InstuctionSentToCustomer</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Getaway_1</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>CheckedApplicationForCompleteness</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>CheckInsurancePolicyInformation</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>SendInsurancePolicyToCustomer</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_1w0424a</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>InstuctionSentToCustomer</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>SaveInstructionInSiteDatabase</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>SavaInsurancePolicyInSiteDatabase</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>SendInsuranceInformationToCustomer</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Wait14Days</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>PolicyConfirmed</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>ReceiptOfCancellationReceived</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>EndPolicyCancelled</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>PolicyConfirmed</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>SendInsuranceInformationToCustomer</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>InsuranceInformationSentToCustomer</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Gateway_02wj7nx</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Wait14Days</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Gateway_1w0424a</bpmn:flowNodeRef>
         <bpmn:childLaneSet id="LaneSet_1gxu9a6" />
       </bpmn:lane>
       <bpmn:lane id="Lane_111ejh0" name="Head of the underwriting department">
-        <bpmn:flowNodeRef>ManualCheck</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>Gateway_5</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ManualCheck</bpmn:flowNodeRef>
       </bpmn:lane>
       <bpmn:lane id="Lane_0aulvib" name="Insurance officer">
-        <bpmn:flowNodeRef>Gateway_3</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>DefineRejectionReason</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Gateway_10bsnpq</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Gateway_0tfqkdd</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>Gateway_2</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>DefineDecisionForPremiumTariff</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>RejectionReasonSentToCustomer</bpmn:flowNodeRef>
-        <bpmn:flowNodeRef>RateCalculation</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>DefineDefautValues</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>RateCalculation</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>RejectionReasonSentToCustomer</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>DefineDecisionForPremiumTariff</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_2</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_0tfqkdd</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_10bsnpq</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>DefineRejectionReason</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Gateway_3</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>CalculateAgeRiskFactor</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>DefineHealthHistoryRiskFactor</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>CalculateGeneralConditionsRiskFactor</bpmn:flowNodeRef>
         <bpmn:flowNodeRef>CalculateAge</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>SaveRejectionInSiteDatabase</bpmn:flowNodeRef>
         <bpmn:childLaneSet id="LaneSet_04acobg" />
       </bpmn:lane>
     </bpmn:laneSet>
+    <bpmn:sequenceFlow id="Flow_1rsm5q5" sourceRef="Gateway_1w0424a" targetRef="ReceiptOfCancellationReceived" />
+    <bpmn:sequenceFlow id="Flow_0pkgzv7" sourceRef="Gateway_1w0424a" targetRef="Wait14Days" />
     <bpmn:sequenceFlow id="Flow_1lzxiz2" sourceRef="DefineDefautValues" targetRef="Gateway_10bsnpq" />
-    <bpmn:sequenceFlow id="Flow_02wobcz" sourceRef="CheckInsurancePolicyInformation" targetRef="SendInsurancePolicyToCustomer" />
+    <bpmn:sequenceFlow id="Flow_02wobcz" sourceRef="CheckInsurancePolicyInformation" targetRef="SavaInsurancePolicyInSiteDatabase" />
     <bpmn:sequenceFlow id="Flow_0ygci78" sourceRef="Gateway_10bsnpq" targetRef="DefineHealthHistoryRiskFactor" />
     <bpmn:sequenceFlow id="Flow_0zkxu6v" sourceRef="DefineHealthHistoryRiskFactor" targetRef="Gateway_0tfqkdd" />
     <bpmn:sequenceFlow id="Flow_1e3c27r" sourceRef="CalculateGeneralConditionsRiskFactor" targetRef="Gateway_0tfqkdd" />
@@ -63,7 +65,7 @@
     <bpmn:sequenceFlow id="ApplicationIncompleteNoReason" name="Application incomplete no reason " sourceRef="Getaway_1" targetRef="CheckedApplicationForCompleteness">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${applicationComplete == false and (reason == '' or reason == null)}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="ApplicationIncomplete" name="Application incomplete" sourceRef="Getaway_1" targetRef="InstuctionSentToCustomer">
+    <bpmn:sequenceFlow id="ApplicationIncomplete" name="Application incomplete" sourceRef="Getaway_1" targetRef="SaveInstructionInSiteDatabase">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${applicationComplete == false and reason != '' and reason != null }</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="ApplicationComplete" name="Application complete" sourceRef="Getaway_1" targetRef="DefineDefautValues">
@@ -93,261 +95,18 @@
     <bpmn:sequenceFlow id="Flow_1ta2mg0" name="Not eligible for insurance" sourceRef="Gateway_3" targetRef="DefineRejectionReason">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${premiumTariffDecision == "NotEligibleForInsurance"}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_14hikcw" sourceRef="DefineRejectionReason" targetRef="RejectionReasonSentToCustomer" />
-    <bpmn:sequenceFlow id="Flow_0kjikel" name="Not eligible for insurance" sourceRef="Gateway_5" targetRef="RejectionReasonSentToCustomer">
+    <bpmn:sequenceFlow id="Flow_14hikcw" sourceRef="DefineRejectionReason" targetRef="SaveRejectionInSiteDatabase" />
+    <bpmn:sequenceFlow id="Flow_0kjikel" name="Not eligible for insurance" sourceRef="Gateway_5" targetRef="SaveRejectionInSiteDatabase">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${eligible == false and reason != '' and reason != null }</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="Flow_1iuymyk" sourceRef="InsuranceApplicationFormReceived" targetRef="CheckedApplicationForCompleteness" />
-    <bpmn:serviceTask id="DefineDefautValues" name="Define defaut values" camunda:expression="${execution.setVariable(&#34;riskSurcharge&#34;, 0)}">
-      <bpmn:incoming>ApplicationComplete</bpmn:incoming>
-      <bpmn:outgoing>Flow_1lzxiz2</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:serviceTask id="RateCalculation" name="Calculate monthly insurance rate" camunda:expression="${ (10 * age &#62; 110 ? 10 * age : 110) +  riskSurcharge  - (isExistingCustomer == true ? 5 : 0) }" camunda:resultVariable="rate">
-      <bpmn:incoming>Flow_0vrg2ts</bpmn:incoming>
-      <bpmn:incoming>Flow_03nnhd7</bpmn:incoming>
-      <bpmn:incoming>Flow_1pqsw4x</bpmn:incoming>
-      <bpmn:outgoing>Flow_10r5mw0</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:endEvent id="RejectionReasonSentToCustomer" name="Rejection reason send to customer">
-      <bpmn:incoming>Flow_0kjikel</bpmn:incoming>
-      <bpmn:incoming>Flow_14hikcw</bpmn:incoming>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_0bxeexe" messageRef="Message_0vjzrjl" camunda:type="external" camunda:topic="rejection" />
-    </bpmn:endEvent>
-    <bpmn:endEvent id="InstuctionSentToCustomer" name="Instuction sent to customer">
-      <bpmn:incoming>ApplicationIncomplete</bpmn:incoming>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_1drzxgr" messageRef="Message_0u3enr9" camunda:type="external" camunda:topic="instruction" />
-    </bpmn:endEvent>
-    <bpmn:startEvent id="InsuranceApplicationFormReceived" name="Insurance application form received">
-      <bpmn:outgoing>Flow_1iuymyk</bpmn:outgoing>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_1jiapzg" messageRef="Message_1xmpkdf" />
-    </bpmn:startEvent>
-    <bpmn:businessRuleTask id="DefineDecisionForPremiumTariff" name="Define decision for premium tariff" camunda:resultVariable="premiumTariffDecision" camunda:decisionRef="DecisionForPremiumTariff" camunda:mapDecisionResult="singleEntry">
-      <bpmn:incoming>Flow_0ctprhz</bpmn:incoming>
-      <bpmn:outgoing>Flow_1j83glw</bpmn:outgoing>
-    </bpmn:businessRuleTask>
-    <bpmn:exclusiveGateway id="Gateway_2" name="Check tariff">
-      <bpmn:incoming>Flow_1xrrpsa</bpmn:incoming>
-      <bpmn:outgoing>Flow_0ctprhz</bpmn:outgoing>
-      <bpmn:outgoing>Flow_1pqsw4x</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
-    <bpmn:parallelGateway id="Gateway_0tfqkdd">
-      <bpmn:incoming>Flow_0zslrip</bpmn:incoming>
-      <bpmn:incoming>Flow_1e3c27r</bpmn:incoming>
-      <bpmn:incoming>Flow_0zkxu6v</bpmn:incoming>
-      <bpmn:outgoing>Flow_1xrrpsa</bpmn:outgoing>
-    </bpmn:parallelGateway>
-    <bpmn:parallelGateway id="Gateway_10bsnpq">
-      <bpmn:incoming>Flow_1lzxiz2</bpmn:incoming>
-      <bpmn:outgoing>Flow_1fidasb</bpmn:outgoing>
-      <bpmn:outgoing>Flow_1tkvy41</bpmn:outgoing>
-      <bpmn:outgoing>Flow_0ygci78</bpmn:outgoing>
-    </bpmn:parallelGateway>
-    <bpmn:exclusiveGateway id="Getaway_1">
-      <bpmn:incoming>Flow_1cog3v9</bpmn:incoming>
-      <bpmn:outgoing>ApplicationIncompleteNoReason</bpmn:outgoing>
-      <bpmn:outgoing>ApplicationIncomplete</bpmn:outgoing>
-      <bpmn:outgoing>ApplicationComplete</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
-    <bpmn:userTask id="CheckedApplicationForCompleteness" name="Check application for completeness" camunda:candidateGroups="underwritingClerks">
-      <bpmn:extensionElements>
-        <camunda:formData>
-          <camunda:formField id="surname" label="Surname" type="string">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="name" label="Name" type="string">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="birthDate" label="Date of birth" type="date">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="address" label="Address" type="string">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="gender" label="Gender" type="string">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="tariff" label="Tariff" type="string">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="insuranceStartDate" label="Insurance start date" type="date">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="height" label="Height" type="long">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="weight" label="Weight" type="long">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="applicationComplete" label="Application complete" type="boolean" />
-          <camunda:formField id="reason" label="Deny reason" type="string" />
-        </camunda:formData>
-      </bpmn:extensionElements>
-      <bpmn:incoming>ApplicationIncompleteNoReason</bpmn:incoming>
-      <bpmn:incoming>Flow_1iuymyk</bpmn:incoming>
-      <bpmn:outgoing>Flow_1cog3v9</bpmn:outgoing>
-    </bpmn:userTask>
-    <bpmn:userTask id="DefineRejectionReason" name="Define rejection reason" camunda:candidateGroups="insuranceOfficers">
-      <bpmn:extensionElements>
-        <camunda:formData>
-          <camunda:formField id="surname" label="Surname" type="string">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="name" label="Name" type="string">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="birthDate" label="Date of birth" type="date">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="gender" label="Gender" type="string">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="height" label="Height" type="long">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="weight" label="Weight" type="long">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="ageRiskFactor" label="Age risk factor" type="long">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="generalConditionsRiskFactor" label="General conditions risk factor" type="long">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="healthHistoryRiskFactor" label="Health history risk factor" type="long">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="reason" label="Rejection reason" type="string">
-            <camunda:validation>
-              <camunda:constraint name="required" />
-            </camunda:validation>
-          </camunda:formField>
-        </camunda:formData>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1ta2mg0</bpmn:incoming>
-      <bpmn:outgoing>Flow_14hikcw</bpmn:outgoing>
-    </bpmn:userTask>
-    <bpmn:exclusiveGateway id="Gateway_3">
-      <bpmn:incoming>Flow_1j83glw</bpmn:incoming>
-      <bpmn:outgoing>Flow_0xvh1og</bpmn:outgoing>
-      <bpmn:outgoing>Flow_0vrg2ts</bpmn:outgoing>
-      <bpmn:outgoing>Flow_1ta2mg0</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
-    <bpmn:exclusiveGateway id="Gateway_5">
-      <bpmn:incoming>Flow_023i9h8</bpmn:incoming>
-      <bpmn:outgoing>Flow_0s1iosi</bpmn:outgoing>
-      <bpmn:outgoing>Flow_03nnhd7</bpmn:outgoing>
-      <bpmn:outgoing>Flow_0kjikel</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
-    <bpmn:userTask id="ManualCheck" name="Manual check" camunda:candidateGroups="headOfTheUnderwritingDepartment">
-      <bpmn:extensionElements>
-        <camunda:formData>
-          <camunda:formField id="surname" label="Surname" type="string">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="name" label="Name" type="string">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="birthDate" label="Date of birth" type="date">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="gender" label="Gender" type="string">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="height" label="Height" type="long">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="weight" label="Weight" type="long">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="ageRiskFactor" label="Age risk factor" type="long">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="generalConditionsRiskFactor" label="General conditions risk factor" type="long">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="healthHistoryRiskFactor" label="Health history risk factor" type="long">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-          <camunda:formField id="eligible" label="Eligible" type="boolean" />
-          <camunda:formField id="reason" label="Rejection reason" type="string" />
-          <camunda:formField id="riskSurcharge" label="Risk surcharge" type="long" defaultValue="0" />
-        </camunda:formData>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_0xvh1og</bpmn:incoming>
-      <bpmn:incoming>Flow_0s1iosi</bpmn:incoming>
-      <bpmn:outgoing>Flow_023i9h8</bpmn:outgoing>
-    </bpmn:userTask>
-    <bpmn:businessRuleTask id="CalculateAgeRiskFactor" name="Calculate age risk factor" camunda:resultVariable="ageRiskFactor" camunda:decisionRef="DefineAgeRiskFactor" camunda:mapDecisionResult="singleEntry">
-      <bpmn:incoming>Flow_0yfox61</bpmn:incoming>
-      <bpmn:outgoing>Flow_0zslrip</bpmn:outgoing>
-    </bpmn:businessRuleTask>
-    <bpmn:businessRuleTask id="DefineHealthHistoryRiskFactor" name="Calculate health history risk factor" camunda:resultVariable="healthHistoryRiskFactor" camunda:decisionRef="DefineHealthHistoryRiskFactor" camunda:mapDecisionResult="singleEntry">
-      <bpmn:incoming>Flow_0ygci78</bpmn:incoming>
-      <bpmn:outgoing>Flow_0zkxu6v</bpmn:outgoing>
-    </bpmn:businessRuleTask>
-    <bpmn:businessRuleTask id="CalculateGeneralConditionsRiskFactor" name="Calculate general conditions risk factor" camunda:resultVariable="generalConditionsRiskFactor" camunda:decisionRef="DefineGeneralConditionsRiskFactor" camunda:mapDecisionResult="singleEntry">
-      <bpmn:incoming>Flow_1tkvy41</bpmn:incoming>
-      <bpmn:outgoing>Flow_1e3c27r</bpmn:outgoing>
-    </bpmn:businessRuleTask>
     <bpmn:sequenceFlow id="Flow_0yfox61" sourceRef="CalculateAge" targetRef="CalculateAgeRiskFactor" />
-    <bpmn:businessRuleTask id="CalculateAge" name="Calculate age " camunda:resultVariable="age" camunda:decisionRef="CalculateAge" camunda:mapDecisionResult="singleEntry">
-      <bpmn:incoming>Flow_1fidasb</bpmn:incoming>
-      <bpmn:outgoing>Flow_0yfox61</bpmn:outgoing>
-    </bpmn:businessRuleTask>
+    <bpmn:sequenceFlow id="Flow_13sgnuf" sourceRef="ReceiptOfCancellationReceived" targetRef="EndPolicyCancelled" />
+    <bpmn:eventBasedGateway id="Gateway_1w0424a">
+      <bpmn:incoming>Flow_0y470z5</bpmn:incoming>
+      <bpmn:outgoing>Flow_0pkgzv7</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1rsm5q5</bpmn:outgoing>
+    </bpmn:eventBasedGateway>
     <bpmn:userTask id="CheckInsurancePolicyInformation" name="Check insurance policy information" camunda:candidateGroups="underwritingClerks">
       <bpmn:extensionElements>
         <camunda:formData>
@@ -411,67 +170,305 @@
       <bpmn:incoming>Flow_10r5mw0</bpmn:incoming>
       <bpmn:outgoing>Flow_02wobcz</bpmn:outgoing>
     </bpmn:userTask>
-    <bpmn:manualTask id="SendInsurancePolicyToCustomer" name="Send insurance policy to customer">
+    <bpmn:businessRuleTask id="CalculateAge" name="Calculate age " camunda:resultVariable="age" camunda:decisionRef="CalculateAge" camunda:mapDecisionResult="singleEntry">
+      <bpmn:incoming>Flow_1fidasb</bpmn:incoming>
+      <bpmn:outgoing>Flow_0yfox61</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:businessRuleTask id="CalculateGeneralConditionsRiskFactor" name="Calculate general conditions risk factor" camunda:resultVariable="generalConditionsRiskFactor" camunda:decisionRef="DefineGeneralConditionsRiskFactor" camunda:mapDecisionResult="singleEntry">
+      <bpmn:incoming>Flow_1tkvy41</bpmn:incoming>
+      <bpmn:outgoing>Flow_1e3c27r</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:businessRuleTask id="DefineHealthHistoryRiskFactor" name="Calculate health history risk factor" camunda:resultVariable="healthHistoryRiskFactor" camunda:decisionRef="DefineHealthHistoryRiskFactor" camunda:mapDecisionResult="singleEntry">
+      <bpmn:incoming>Flow_0ygci78</bpmn:incoming>
+      <bpmn:outgoing>Flow_0zkxu6v</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:businessRuleTask id="CalculateAgeRiskFactor" name="Calculate age risk factor" camunda:resultVariable="ageRiskFactor" camunda:decisionRef="DefineAgeRiskFactor" camunda:mapDecisionResult="singleEntry">
+      <bpmn:incoming>Flow_0yfox61</bpmn:incoming>
+      <bpmn:outgoing>Flow_0zslrip</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:userTask id="ManualCheck" name="Manual check" camunda:candidateGroups="headOfTheUnderwritingDepartment">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="surname" label="Surname" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="name" label="Name" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="birthDate" label="Date of birth" type="date">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="gender" label="Gender" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="height" label="Height" type="long">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="weight" label="Weight" type="long">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="ageRiskFactor" label="Age risk factor" type="long">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="generalConditionsRiskFactor" label="General conditions risk factor" type="long">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="healthHistoryRiskFactor" label="Health history risk factor" type="long">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="eligible" label="Eligible" type="boolean" />
+          <camunda:formField id="reason" label="Rejection reason" type="string" />
+          <camunda:formField id="riskSurcharge" label="Risk surcharge" type="long" defaultValue="0" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0xvh1og</bpmn:incoming>
+      <bpmn:incoming>Flow_0s1iosi</bpmn:incoming>
+      <bpmn:outgoing>Flow_023i9h8</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_5">
+      <bpmn:incoming>Flow_023i9h8</bpmn:incoming>
+      <bpmn:outgoing>Flow_0s1iosi</bpmn:outgoing>
+      <bpmn:outgoing>Flow_03nnhd7</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0kjikel</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="Gateway_3">
+      <bpmn:incoming>Flow_1j83glw</bpmn:incoming>
+      <bpmn:outgoing>Flow_0xvh1og</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0vrg2ts</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1ta2mg0</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="DefineRejectionReason" name="Define rejection reason" camunda:candidateGroups="insuranceOfficers">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="surname" label="Surname" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="name" label="Name" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="birthDate" label="Date of birth" type="date">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="gender" label="Gender" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="height" label="Height" type="long">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="weight" label="Weight" type="long">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="ageRiskFactor" label="Age risk factor" type="long">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="generalConditionsRiskFactor" label="General conditions risk factor" type="long">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="healthHistoryRiskFactor" label="Health history risk factor" type="long">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="reason" label="Rejection reason" type="string">
+            <camunda:validation>
+              <camunda:constraint name="required" />
+            </camunda:validation>
+          </camunda:formField>
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1ta2mg0</bpmn:incoming>
+      <bpmn:outgoing>Flow_14hikcw</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="CheckedApplicationForCompleteness" name="Check application for completeness" camunda:candidateGroups="underwritingClerks">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="surname" label="Surname" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="name" label="Name" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="birthDate" label="Date of birth" type="date">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="address" label="Address" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="gender" label="Gender" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="tariff" label="Tariff" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="insuranceStartDate" label="Insurance start date" type="date">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="height" label="Height" type="long">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="weight" label="Weight" type="long">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="applicationComplete" label="Application complete" type="boolean" />
+          <camunda:formField id="reason" label="Deny reason" type="string" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>ApplicationIncompleteNoReason</bpmn:incoming>
+      <bpmn:incoming>Flow_1iuymyk</bpmn:incoming>
+      <bpmn:outgoing>Flow_1cog3v9</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Getaway_1">
+      <bpmn:incoming>Flow_1cog3v9</bpmn:incoming>
+      <bpmn:outgoing>ApplicationIncompleteNoReason</bpmn:outgoing>
+      <bpmn:outgoing>ApplicationIncomplete</bpmn:outgoing>
+      <bpmn:outgoing>ApplicationComplete</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:parallelGateway id="Gateway_10bsnpq">
+      <bpmn:incoming>Flow_1lzxiz2</bpmn:incoming>
+      <bpmn:outgoing>Flow_1fidasb</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1tkvy41</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0ygci78</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:parallelGateway id="Gateway_0tfqkdd">
+      <bpmn:incoming>Flow_0zslrip</bpmn:incoming>
+      <bpmn:incoming>Flow_1e3c27r</bpmn:incoming>
+      <bpmn:incoming>Flow_0zkxu6v</bpmn:incoming>
+      <bpmn:outgoing>Flow_1xrrpsa</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:exclusiveGateway id="Gateway_2" name="Check tariff">
+      <bpmn:incoming>Flow_1xrrpsa</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ctprhz</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1pqsw4x</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:businessRuleTask id="DefineDecisionForPremiumTariff" name="Define decision for premium tariff" camunda:resultVariable="premiumTariffDecision" camunda:decisionRef="DecisionForPremiumTariff" camunda:mapDecisionResult="singleEntry">
+      <bpmn:incoming>Flow_0ctprhz</bpmn:incoming>
+      <bpmn:outgoing>Flow_1j83glw</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:startEvent id="InsuranceApplicationFormReceived" name="Insurance application form received">
+      <bpmn:outgoing>Flow_1iuymyk</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1jiapzg" messageRef="Message_1xmpkdf" />
+    </bpmn:startEvent>
+    <bpmn:endEvent id="RejectionReasonSentToCustomer" name="Rejection reason send to customer">
+      <bpmn:incoming>Flow_073zmok</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0bxeexe" messageRef="Message_0vjzrjl" camunda:expression="${execution.getVariable(&#39;processId&#39;) != null ? execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation(&#34;Rejection&#34;).processInstanceId(processId).setVariables(execution.getVariables()).correlateWithResult() : &#34;&#34;}" />
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="RateCalculation" name="Calculate monthly insurance rate" camunda:expression="${ (10 * age &#62; 110 ? 10 * age : 110) +  riskSurcharge  - (isExistingCustomer == true ? 5 : 0) }" camunda:resultVariable="rate">
+      <bpmn:incoming>Flow_0vrg2ts</bpmn:incoming>
+      <bpmn:incoming>Flow_03nnhd7</bpmn:incoming>
+      <bpmn:incoming>Flow_1pqsw4x</bpmn:incoming>
+      <bpmn:outgoing>Flow_10r5mw0</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="DefineDefautValues" name="Define defaut values" camunda:expression="${execution.setVariable(&#34;riskSurcharge&#34;, 0)}">
+      <bpmn:incoming>ApplicationComplete</bpmn:incoming>
+      <bpmn:outgoing>Flow_1lzxiz2</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="InstuctionSentToCustomer" name="Instuction sent to customer">
+      <bpmn:incoming>Flow_1kv6n8m</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1drzxgr" messageRef="Message_0u3enr9" camunda:expression="${execution.getVariable(&#39;processId&#39;) != null ? execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation(&#34;Instuction&#34;).processInstanceId(processId).setVariables(execution.getVariables()).correlateWithResult() : &#34;&#34;}" />
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1kv6n8m" sourceRef="SaveInstructionInSiteDatabase" targetRef="InstuctionSentToCustomer" />
+    <bpmn:serviceTask id="SaveInstructionInSiteDatabase" name="Save instruction in site database" camunda:type="external" camunda:topic="instruction">
+      <bpmn:incoming>ApplicationIncomplete</bpmn:incoming>
+      <bpmn:outgoing>Flow_1kv6n8m</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_073zmok" sourceRef="SaveRejectionInSiteDatabase" targetRef="RejectionReasonSentToCustomer" />
+    <bpmn:serviceTask id="SaveRejectionInSiteDatabase" name="Save rejection in site database" camunda:type="external" camunda:topic="rejection">
+      <bpmn:incoming>Flow_0kjikel</bpmn:incoming>
+      <bpmn:incoming>Flow_14hikcw</bpmn:incoming>
+      <bpmn:outgoing>Flow_073zmok</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="SavaInsurancePolicyInSiteDatabase" name="Sava insurance policy in site database" camunda:type="external" camunda:topic="approval">
       <bpmn:incoming>Flow_02wobcz</bpmn:incoming>
-      <bpmn:outgoing>Flow_1bjdjlr</bpmn:outgoing>
-    </bpmn:manualTask>
+      <bpmn:outgoing>Flow_16ajpel</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_16ajpel" sourceRef="SavaInsurancePolicyInSiteDatabase" targetRef="SendInsuranceInformationToCustomer" />
+    <bpmn:intermediateThrowEvent id="SendInsuranceInformationToCustomer" name="Send insurance information to customer">
+      <bpmn:incoming>Flow_16ajpel</bpmn:incoming>
+      <bpmn:outgoing>Flow_0y470z5</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1fvwrtu" messageRef="Message_0zzgew5" camunda:expression="${execution.getVariable(&#39;processId&#39;) != null ? execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation(&#34;Approval&#34;).processInstanceId(processId).setVariables(execution.getVariables()).setVariable(&#34;processId&#34;, execution.getProcessInstanceId()).correlateWithResult() : &#34;&#34;}" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:sequenceFlow id="Flow_0y470z5" sourceRef="SendInsuranceInformationToCustomer" targetRef="Gateway_1w0424a" />
+    <bpmn:intermediateCatchEvent id="Wait14Days" name="Wait 14 days">
+      <bpmn:incoming>Flow_0pkgzv7</bpmn:incoming>
+      <bpmn:outgoing>Flow_1l4o3i5</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_1d8gby4">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">P14D</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_1l4o3i5" sourceRef="Wait14Days" targetRef="PolicyConfirmed" />
+    <bpmn:endEvent id="PolicyConfirmed" name="Policy confirmed">
+      <bpmn:incoming>Flow_1l4o3i5</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0crt7um" messageRef="Message_151lhok" camunda:expression="${execution.getVariable(&#39;processId&#39;) != null ? execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation(&#34;PolicyConfirmation&#34;).processInstanceId(processId).correlateWithResult() : &#34;&#34;}" />
+    </bpmn:endEvent>
     <bpmn:intermediateCatchEvent id="ReceiptOfCancellationReceived" name="Receipt of a cancellation received">
       <bpmn:incoming>Flow_1rsm5q5</bpmn:incoming>
       <bpmn:outgoing>Flow_13sgnuf</bpmn:outgoing>
       <bpmn:messageEventDefinition id="MessageEventDefinition_0wy93un" messageRef="Message_0iiklu0" />
     </bpmn:intermediateCatchEvent>
-    <bpmn:sequenceFlow id="Flow_13sgnuf" sourceRef="ReceiptOfCancellationReceived" targetRef="EndPolicyCancelled" />
     <bpmn:endEvent id="EndPolicyCancelled" name="End">
       <bpmn:incoming>Flow_13sgnuf</bpmn:incoming>
-      <bpmn:incoming>Flow_0xu462h</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:endEvent id="PolicyConfirmed" name="Policy confirmed">
-      <bpmn:incoming>Flow_0vgqjwe</bpmn:incoming>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_0crt7um" messageRef="Message_151lhok" camunda:expression="${execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation(&#34;PolicyConformation&#34;).processInstanceId(processId).correlateWithResult()}" />
-    </bpmn:endEvent>
-    <bpmn:sendTask id="SendInsuranceInformationToCustomer" name="Send insurance information to customer" camunda:type="external" camunda:topic="approval">
-      <bpmn:incoming>Flow_1bjdjlr</bpmn:incoming>
-      <bpmn:outgoing>Flow_1omwisb</bpmn:outgoing>
-    </bpmn:sendTask>
-    <bpmn:sequenceFlow id="Flow_1bjdjlr" sourceRef="SendInsurancePolicyToCustomer" targetRef="SendInsuranceInformationToCustomer" />
-    <bpmn:intermediateThrowEvent id="InsuranceInformationSentToCustomer" name="Insurance information sent to customer">
-      <bpmn:messageEventDefinition id="MessageEventDefinition_0u522ve" messageRef="Message_0zzgew5" camunda:type="external" camunda:topic="approval" />
-    </bpmn:intermediateThrowEvent>
-    <bpmn:sequenceFlow id="Flow_1omwisb" sourceRef="SendInsuranceInformationToCustomer" targetRef="Gateway_1w0424a" />
-    <bpmn:exclusiveGateway id="Gateway_02wj7nx">
-      <bpmn:incoming>Flow_10o0b0b</bpmn:incoming>
-      <bpmn:outgoing>Flow_0vgqjwe</bpmn:outgoing>
-      <bpmn:outgoing>Flow_0xu462h</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
-    <bpmn:sequenceFlow id="Flow_10o0b0b" sourceRef="Wait14Days" targetRef="Gateway_02wj7nx" />
-    <bpmn:sequenceFlow id="Flow_0vgqjwe" sourceRef="Gateway_02wj7nx" targetRef="PolicyConfirmed">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${execution.getVariable('processId') != null}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_0xu462h" sourceRef="Gateway_02wj7nx" targetRef="EndPolicyCancelled">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${execution.getVariable('processId') == null}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_0pkgzv7" sourceRef="Gateway_1w0424a" targetRef="Wait14Days" />
-    <bpmn:intermediateCatchEvent id="Wait14Days" name="Wait 14 days">
-      <bpmn:incoming>Flow_0pkgzv7</bpmn:incoming>
-      <bpmn:outgoing>Flow_10o0b0b</bpmn:outgoing>
-      <bpmn:timerEventDefinition id="TimerEventDefinition_1d8gby4">
-        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">P14D</bpmn:timeDuration>
-      </bpmn:timerEventDefinition>
-    </bpmn:intermediateCatchEvent>
-    <bpmn:sequenceFlow id="Flow_1rsm5q5" sourceRef="Gateway_1w0424a" targetRef="ReceiptOfCancellationReceived" />
-    <bpmn:eventBasedGateway id="Gateway_1w0424a">
-      <bpmn:incoming>Flow_1omwisb</bpmn:incoming>
-      <bpmn:outgoing>Flow_0pkgzv7</bpmn:outgoing>
-      <bpmn:outgoing>Flow_1rsm5q5</bpmn:outgoing>
-    </bpmn:eventBasedGateway>
   </bpmn:process>
   <bpmn:message id="Message_1xmpkdf" name="InsuranceApplicationForm" />
   <bpmn:message id="Message_0u3enr9" name="Instuction" />
   <bpmn:message id="Message_0vjzrjl" name="Rejection" />
   <bpmn:message id="Message_0zzgew5" name="Approval" />
-  <bpmn:message id="Message_151lhok" name="PolicyConformation" />
+  <bpmn:message id="Message_151lhok" name="PolicyConfirmation" />
   <bpmn:message id="Message_0iiklu0" name="ReceiptOfCancellation" />
   <bpmn:process id="SendInsuranceRequest" name="Send insurance request" isExecutable="true">
+    <bpmn:sequenceFlow id="Flow_05rchqb" sourceRef="PolicyRemainsValid" targetRef="EndPolicyConfirmed" />
     <bpmn:sequenceFlow id="Flow_0f8d0ql" name="Policy cancelled" sourceRef="Gateway_1ahpgeg" targetRef="ReceiptOfCancellationSent">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${cancelPolicy == true}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
@@ -480,70 +477,18 @@
     <bpmn:sequenceFlow id="Flow_1gxhao4" sourceRef="InsuranceRejected" targetRef="InsuranceAapplicationRejected" />
     <bpmn:sequenceFlow id="Flow_19450wr" sourceRef="InstuctionReceived" targetRef="InsuranceApplicationIncomplete" />
     <bpmn:sequenceFlow id="Flow_1dfgevv" sourceRef="Start" targetRef="AssignUser" />
-    <bpmn:sequenceFlow id="Flow_1trd458" sourceRef="FillInsuranceApplicationForm" targetRef="SendInsuranceApplicationForm" />
     <bpmn:sequenceFlow id="Flow_0iodkzm" sourceRef="CheckInsuranceConditions" targetRef="Gateway_1ahpgeg" />
     <bpmn:sequenceFlow id="Flow_1b38vi1" name="Policy not cancelled" sourceRef="Gateway_1ahpgeg" targetRef="CheckInsuranceConditions">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${cancelPolicy == false}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_1djbgpc" sourceRef="InsuranceAapplicationRejected" targetRef="Event_1uz06kz" />
-    <bpmn:sequenceFlow id="Flow_0v7tjx7" sourceRef="InsuranceApplicationIncomplete" targetRef="Event_14f8gr3" />
-    <bpmn:sequenceFlow id="Flow_1fx0y6u" sourceRef="SendInsuranceApplicationForm" targetRef="Gateway_0zwobbh" />
     <bpmn:sequenceFlow id="Flow_1pnk656" sourceRef="Gateway_0zwobbh" targetRef="InstuctionReceived" />
     <bpmn:sequenceFlow id="Flow_0etsyt1" sourceRef="Gateway_0zwobbh" targetRef="InsuranceRejected" />
-    <bpmn:sequenceFlow id="Flow_11lo56i" sourceRef="Gateway_0zwobbh" targetRef="InsuranceApproved" />
     <bpmn:eventBasedGateway id="Gateway_0zwobbh">
-      <bpmn:incoming>Flow_1fx0y6u</bpmn:incoming>
-      <bpmn:outgoing>Flow_1pnk656</bpmn:outgoing>
+      <bpmn:incoming>Flow_0j2zge0</bpmn:incoming>
       <bpmn:outgoing>Flow_0etsyt1</bpmn:outgoing>
-      <bpmn:outgoing>Flow_11lo56i</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1pnk656</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1hergtu</bpmn:outgoing>
     </bpmn:eventBasedGateway>
-    <bpmn:endEvent id="Event_14f8gr3" name="End">
-      <bpmn:incoming>Flow_0v7tjx7</bpmn:incoming>
-    </bpmn:endEvent>
-    <bpmn:endEvent id="Event_1uz06kz" name="End">
-      <bpmn:incoming>Flow_1djbgpc</bpmn:incoming>
-    </bpmn:endEvent>
-    <bpmn:userTask id="InsuranceAapplicationRejected" name="Insurance application rejected" camunda:assignee="${user}">
-      <bpmn:extensionElements>
-        <camunda:formData>
-          <camunda:formField id="reason" label="Insurance application rejection reason:" type="string">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-        </camunda:formData>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_1gxhao4</bpmn:incoming>
-      <bpmn:outgoing>Flow_1djbgpc</bpmn:outgoing>
-    </bpmn:userTask>
-    <bpmn:intermediateCatchEvent id="InsuranceRejected" name="Insurance rejected">
-      <bpmn:incoming>Flow_0etsyt1</bpmn:incoming>
-      <bpmn:outgoing>Flow_1gxhao4</bpmn:outgoing>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_030se8l" messageRef="Message_0vjzrjl" />
-    </bpmn:intermediateCatchEvent>
-    <bpmn:intermediateThrowEvent id="SendInsuranceApplicationForm" name="Send insurance application form">
-      <bpmn:incoming>Flow_1trd458</bpmn:incoming>
-      <bpmn:outgoing>Flow_1fx0y6u</bpmn:outgoing>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_1vg4k4p" messageRef="Message_1xmpkdf" camunda:expression="${execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation(&#34;InsuranceApplicationForm&#34;).setVariables(execution.getVariables()).setVariable(&#34;processId&#34;, execution.getProcessInstanceId()).correlateWithResult()}" />
-    </bpmn:intermediateThrowEvent>
-    <bpmn:intermediateCatchEvent id="InstuctionReceived" name="Instuction received">
-      <bpmn:incoming>Flow_1pnk656</bpmn:incoming>
-      <bpmn:outgoing>Flow_19450wr</bpmn:outgoing>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_1dldim5" messageRef="Message_0u3enr9" />
-    </bpmn:intermediateCatchEvent>
-    <bpmn:userTask id="InsuranceApplicationIncomplete" name="Insurance application incomplete" camunda:assignee="${user}">
-      <bpmn:extensionElements>
-        <camunda:formData>
-          <camunda:formField id="reason" label="Please submit insurance application again with following information:" type="string">
-            <camunda:validation>
-              <camunda:constraint name="readonly" />
-            </camunda:validation>
-          </camunda:formField>
-        </camunda:formData>
-      </bpmn:extensionElements>
-      <bpmn:incoming>Flow_19450wr</bpmn:incoming>
-      <bpmn:outgoing>Flow_0v7tjx7</bpmn:outgoing>
-    </bpmn:userTask>
     <bpmn:startEvent id="Start" name="Start">
       <bpmn:outgoing>Flow_1dfgevv</bpmn:outgoing>
     </bpmn:startEvent>
@@ -582,13 +527,65 @@
         </camunda:formData>
       </bpmn:extensionElements>
       <bpmn:incoming>Flow_0ywr1aj</bpmn:incoming>
-      <bpmn:outgoing>Flow_1trd458</bpmn:outgoing>
+      <bpmn:outgoing>Flow_08uqlze</bpmn:outgoing>
     </bpmn:userTask>
     <bpmn:intermediateCatchEvent id="InsuranceApproved" name="Insurance approved">
-      <bpmn:incoming>Flow_11lo56i</bpmn:incoming>
+      <bpmn:incoming>Flow_1hergtu</bpmn:incoming>
       <bpmn:outgoing>Flow_051cxlc</bpmn:outgoing>
       <bpmn:messageEventDefinition id="MessageEventDefinition_0i5ke95" messageRef="Message_0zzgew5" />
     </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_0v7tjx7" sourceRef="InsuranceApplicationIncomplete" targetRef="Event_14f8gr3" />
+    <bpmn:sequenceFlow id="Flow_1djbgpc" sourceRef="InsuranceAapplicationRejected" targetRef="Event_1uz06kz" />
+    <bpmn:endEvent id="Event_1uz06kz" name="End">
+      <bpmn:incoming>Flow_1djbgpc</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:userTask id="InsuranceAapplicationRejected" name="Insurance application rejected" camunda:assignee="${user}">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="reason" label="Insurance application rejection reason:" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1gxhao4</bpmn:incoming>
+      <bpmn:outgoing>Flow_1djbgpc</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:intermediateCatchEvent id="InsuranceRejected" name="Insurance rejected">
+      <bpmn:incoming>Flow_0etsyt1</bpmn:incoming>
+      <bpmn:outgoing>Flow_1gxhao4</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_030se8l" messageRef="Message_0vjzrjl" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:intermediateThrowEvent id="SendInsuranceApplicationForm" name="Send insurance application form">
+      <bpmn:incoming>Flow_08uqlze</bpmn:incoming>
+      <bpmn:outgoing>Flow_0j2zge0</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1vg4k4p" messageRef="Message_1xmpkdf" camunda:expression="${execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation(&#34;InsuranceApplicationForm&#34;).setVariables(execution.getVariables()).setVariable(&#34;processId&#34;, execution.getProcessInstanceId()).correlateWithResult()}" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:sequenceFlow id="Flow_08uqlze" sourceRef="FillInsuranceApplicationForm" targetRef="SendInsuranceApplicationForm" />
+    <bpmn:sequenceFlow id="Flow_0j2zge0" sourceRef="SendInsuranceApplicationForm" targetRef="Gateway_0zwobbh" />
+    <bpmn:endEvent id="Event_14f8gr3" name="End">
+      <bpmn:incoming>Flow_0v7tjx7</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:userTask id="InsuranceApplicationIncomplete" name="Insurance application incomplete" camunda:assignee="${user}">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="reason" label="Please submit insurance application again with following information:" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_19450wr</bpmn:incoming>
+      <bpmn:outgoing>Flow_0v7tjx7</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:intermediateCatchEvent id="InstuctionReceived" name="Instuction received">
+      <bpmn:incoming>Flow_1pnk656</bpmn:incoming>
+      <bpmn:outgoing>Flow_19450wr</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1dldim5" messageRef="Message_0u3enr9" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_1hergtu" sourceRef="Gateway_0zwobbh" targetRef="InsuranceApproved" />
     <bpmn:userTask id="CheckInsuranceConditions" name="Check insurance conditions" camunda:assignee="${user}">
       <bpmn:extensionElements>
         <camunda:formData>
@@ -625,28 +622,28 @@
           <camunda:formField id="cancelPolicy" label=" Send receipt of a cancellation" type="boolean" />
         </camunda:formData>
       </bpmn:extensionElements>
-      <bpmn:incoming>Flow_051cxlc</bpmn:incoming>
       <bpmn:incoming>Flow_1b38vi1</bpmn:incoming>
+      <bpmn:incoming>Flow_051cxlc</bpmn:incoming>
       <bpmn:outgoing>Flow_0iodkzm</bpmn:outgoing>
     </bpmn:userTask>
-    <bpmn:endEvent id="ReceiptOfCancellationSent" name="Receipt of a cancellation sent">
-      <bpmn:incoming>Flow_0f8d0ql</bpmn:incoming>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_0jr8xvk" messageRef="Message_0iiklu0" camunda:expression="${execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation(&#34;ReceiptOfCancellation&#34;).processInstanceId(processId).correlateWithResult()}" />
-    </bpmn:endEvent>
+    <bpmn:boundaryEvent id="PolicyRemainsValid" name="Policy remains valid" attachedToRef="CheckInsuranceConditions">
+      <bpmn:outgoing>Flow_05rchqb</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1hlah50" messageRef="Message_151lhok" />
+    </bpmn:boundaryEvent>
     <bpmn:exclusiveGateway id="Gateway_1ahpgeg">
       <bpmn:incoming>Flow_0iodkzm</bpmn:incoming>
       <bpmn:outgoing>Flow_0f8d0ql</bpmn:outgoing>
       <bpmn:outgoing>Flow_1b38vi1</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:intermediateCatchEvent id="PolicyRemainsValid" name="Policy remains valid">
-      <bpmn:outgoing>Flow_05rchqb</bpmn:outgoing>
-      <bpmn:messageEventDefinition id="MessageEventDefinition_1lljn3x" messageRef="Message_151lhok" />
-    </bpmn:intermediateCatchEvent>
     <bpmn:endEvent id="EndPolicyConfirmed" name="End">
       <bpmn:incoming>Flow_05rchqb</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_05rchqb" sourceRef="PolicyRemainsValid" targetRef="EndPolicyConfirmed" />
+    <bpmn:endEvent id="ReceiptOfCancellationSent" name="Receipt of a cancellation sent">
+      <bpmn:incoming>Flow_0f8d0ql</bpmn:incoming>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_1sfcazw" messageRef="Message_0iiklu0" camunda:expression="${execution.getProcessEngineServices().getRuntimeService().createMessageCorrelation(&#34;ReceiptOfCancellation&#34;).processInstanceId(processId).correlateWithResult()}" />
+    </bpmn:endEvent>
   </bpmn:process>
+  <bpmn:message id="Message_1k0hcr4" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="InsuranceApplication">
       <bpmndi:BPMNShape id="Participant_0qv0tma_di" bpmnElement="Participant_0qv0tma" isHorizontal="true">
@@ -662,8 +659,8 @@
         <dc:Bounds x="190" y="340" width="3960" height="290" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_13sgnuf_di" bpmnElement="Flow_13sgnuf">
-        <di:waypoint x="3948" y="480" />
-        <di:waypoint x="4022" y="480" />
+        <di:waypoint x="3968" y="480" />
+        <di:waypoint x="4012" y="480" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0yfox61_di" bpmnElement="Flow_0yfox61">
         <di:waypoint x="1470" y="690" />
@@ -676,14 +673,14 @@
       <bpmndi:BPMNEdge id="Flow_0kjikel_di" bpmnElement="Flow_0kjikel">
         <di:waypoint x="2530" y="1010" />
         <di:waypoint x="2530" y="870" />
-        <di:waypoint x="2680" y="870" />
+        <di:waypoint x="2550" y="870" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="2534" y="976" width="72" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_14hikcw_di" bpmnElement="Flow_14hikcw">
         <di:waypoint x="2450" y="830" />
-        <di:waypoint x="2682" y="830" />
+        <di:waypoint x="2550" y="830" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1ta2mg0_di" bpmnElement="Flow_1ta2mg0">
         <di:waypoint x="2235" y="830" />
@@ -768,9 +765,9 @@
       <bpmndi:BPMNEdge id="Flow_15teya7_di" bpmnElement="ApplicationIncomplete">
         <di:waypoint x="1040" y="495" />
         <di:waypoint x="1040" y="400" />
-        <di:waypoint x="1132" y="400" />
+        <di:waypoint x="1080" y="400" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="1053" y="446" width="54" height="27" />
+          <dc:Bounds x="1053" y="466" width="54" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0kucvn2_di" bpmnElement="ApplicationIncompleteNoReason">
@@ -826,38 +823,33 @@
         <di:waypoint x="1250" y="780" />
         <di:waypoint x="1285" y="780" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1bjdjlr_di" bpmnElement="Flow_1bjdjlr">
-        <di:waypoint x="3420" y="480" />
-        <di:waypoint x="3460" y="480" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1omwisb_di" bpmnElement="Flow_1omwisb">
-        <di:waypoint x="3560" y="480" />
-        <di:waypoint x="3605" y="480" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_10o0b0b_di" bpmnElement="Flow_10o0b0b">
-        <di:waypoint x="3728" y="480" />
-        <di:waypoint x="3765" y="480" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0vgqjwe_di" bpmnElement="Flow_0vgqjwe">
-        <di:waypoint x="3790" y="455" />
-        <di:waypoint x="3790" y="398" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0xu462h_di" bpmnElement="Flow_0xu462h">
-        <di:waypoint x="3790" y="455" />
-        <di:waypoint x="3790" y="430" />
-        <di:waypoint x="4040" y="430" />
-        <di:waypoint x="4040" y="462" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0pkgzv7_di" bpmnElement="Flow_0pkgzv7">
-        <di:waypoint x="3655" y="480" />
-        <di:waypoint x="3692" y="480" />
+        <di:waypoint x="3630" y="455" />
+        <di:waypoint x="3630" y="398" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1rsm5q5_di" bpmnElement="Flow_1rsm5q5">
-        <di:waypoint x="3630" y="505" />
-        <di:waypoint x="3630" y="550" />
-        <di:waypoint x="3880" y="550" />
-        <di:waypoint x="3880" y="480" />
-        <di:waypoint x="3912" y="480" />
+        <di:waypoint x="3655" y="480" />
+        <di:waypoint x="3932" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1kv6n8m_di" bpmnElement="Flow_1kv6n8m">
+        <di:waypoint x="1180" y="400" />
+        <di:waypoint x="1232" y="400" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_073zmok_di" bpmnElement="Flow_073zmok">
+        <di:waypoint x="2650" y="850" />
+        <di:waypoint x="2682" y="850" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_16ajpel_di" bpmnElement="Flow_16ajpel">
+        <di:waypoint x="3420" y="480" />
+        <di:waypoint x="3472" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0y470z5_di" bpmnElement="Flow_0y470z5">
+        <di:waypoint x="3508" y="480" />
+        <di:waypoint x="3605" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1l4o3i5_di" bpmnElement="Flow_1l4o3i5">
+        <di:waypoint x="3648" y="380" />
+        <di:waypoint x="3672" y="380" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Activity_1a2wft2_di" bpmnElement="DefineDefautValues">
         <dc:Bounds x="1150" y="740" width="100" height="80" />
@@ -869,12 +861,6 @@
         <dc:Bounds x="2682" y="832" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="2661" y="875" width="86" height="27" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_11qq850_di" bpmnElement="InstuctionSentToCustomer">
-        <dc:Bounds x="1132" y="382" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1111" y="425" width="84" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0njm3lf_di" bpmnElement="InsuranceApplicationFormReceived">
@@ -937,57 +923,57 @@
       <bpmndi:BPMNShape id="Activity_17l95p7_di" bpmnElement="CheckInsurancePolicyInformation">
         <dc:Bounds x="3180" y="440" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_11b93p3_di" bpmnElement="SendInsurancePolicyToCustomer">
-        <dc:Bounds x="3320" y="440" width="100" height="80" />
+      <bpmndi:BPMNShape id="Gateway_0g82667_di" bpmnElement="Gateway_1w0424a">
+        <dc:Bounds x="3605" y="455" width="50" height="50" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_02a16tn_di" bpmnElement="ReceiptOfCancellationReceived">
-        <dc:Bounds x="3912" y="462" width="36" height="36" />
+      <bpmndi:BPMNShape id="Event_11qq850_di" bpmnElement="InstuctionSentToCustomer">
+        <dc:Bounds x="1232" y="382" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="3900.5" y="508" width="59" height="40" />
+          <dc:Bounds x="1211" y="425" width="84" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0av5eg4_di" bpmnElement="EndPolicyCancelled">
-        <dc:Bounds x="4022" y="462" width="36" height="36" />
+      <bpmndi:BPMNShape id="Activity_124rwi0_di" bpmnElement="SaveInstructionInSiteDatabase">
+        <dc:Bounds x="1080" y="360" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0qjxsut_di" bpmnElement="SaveRejectionInSiteDatabase">
+        <dc:Bounds x="2550" y="810" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0axiwsr_di" bpmnElement="SavaInsurancePolicyInSiteDatabase">
+        <dc:Bounds x="3320" y="440" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_070oejc_di" bpmnElement="SendInsuranceInformationToCustomer">
+        <dc:Bounds x="3472" y="462" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="4030" y="508" width="20" height="14" />
+          <dc:Bounds x="3452" y="505" width="77" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0k60vxi_di" bpmnElement="Wait14Days">
+        <dc:Bounds x="3612" y="362" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3538" y="373" width="63" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_0f649rg_di" bpmnElement="PolicyConfirmed">
-        <dc:Bounds x="3772" y="362" width="36" height="36" />
+        <dc:Bounds x="3672" y="362" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="3680.5" y="373" width="81" height="14" />
+          <dc:Bounds x="3649.5" y="408" width="81" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0vegryq_di" bpmnElement="SendInsuranceInformationToCustomer">
-        <dc:Bounds x="3460" y="440" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_16xzqeq_di" bpmnElement="InsuranceInformationSentToCustomer">
-        <dc:Bounds x="3332" y="352" width="36" height="36" />
+      <bpmndi:BPMNShape id="Event_02a16tn_di" bpmnElement="ReceiptOfCancellationReceived">
+        <dc:Bounds x="3932" y="462" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="3319" y="395" width="80" height="40" />
+          <dc:Bounds x="3920.5" y="508" width="59" height="40" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_02wj7nx_di" bpmnElement="Gateway_02wj7nx" isMarkerVisible="true">
-        <dc:Bounds x="3765" y="455" width="50" height="50" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0k60vxi_di" bpmnElement="Wait14Days">
-        <dc:Bounds x="3692" y="462" width="36" height="36" />
+      <bpmndi:BPMNShape id="Event_0av5eg4_di" bpmnElement="EndPolicyCancelled">
+        <dc:Bounds x="4012" y="462" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="3678" y="438" width="63" height="14" />
+          <dc:Bounds x="4020" y="508" width="20" height="14" />
         </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_0g82667_di" bpmnElement="Gateway_1w0424a">
-        <dc:Bounds x="3605" y="455" width="50" height="50" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Participant_1xuhayc_di" bpmnElement="Participant_1xuhayc" isHorizontal="true">
         <dc:Bounds x="160" y="40" width="3990" height="270" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_11lo56i_di" bpmnElement="Flow_11lo56i">
-        <di:waypoint x="830" y="135" />
-        <di:waypoint x="830" y="70" />
-        <di:waypoint x="3490" y="70" />
-        <di:waypoint x="3490" y="152" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0etsyt1_di" bpmnElement="Flow_0etsyt1">
         <di:waypoint x="830" y="135" />
         <di:waypoint x="830" y="100" />
@@ -996,44 +982,36 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1pnk656_di" bpmnElement="Flow_1pnk656">
         <di:waypoint x="855" y="160" />
-        <di:waypoint x="1132" y="160" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1fx0y6u_di" bpmnElement="Flow_1fx0y6u">
-        <di:waypoint x="718" y="160" />
-        <di:waypoint x="805" y="160" />
+        <di:waypoint x="1232" y="160" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0v7tjx7_di" bpmnElement="Flow_0v7tjx7">
-        <di:waypoint x="1330" y="160" />
-        <di:waypoint x="1382" y="160" />
+        <di:waypoint x="1410" y="160" />
+        <di:waypoint x="1452" y="160" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1djbgpc_di" bpmnElement="Flow_1djbgpc">
         <di:waypoint x="2880" y="160" />
         <di:waypoint x="2932" y="160" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1b38vi1_di" bpmnElement="Flow_1b38vi1">
-        <di:waypoint x="3780" y="145" />
-        <di:waypoint x="3780" y="90" />
-        <di:waypoint x="3620" y="90" />
-        <di:waypoint x="3620" y="130" />
+        <di:waypoint x="3810" y="145" />
+        <di:waypoint x="3810" y="90" />
+        <di:waypoint x="3690" y="90" />
+        <di:waypoint x="3690" y="130" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="3677" y="72" width="49" height="27" />
+          <dc:Bounds x="3727" y="96" width="49" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0iodkzm_di" bpmnElement="Flow_0iodkzm">
-        <di:waypoint x="3670" y="170" />
-        <di:waypoint x="3755" y="170" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1trd458_di" bpmnElement="Flow_1trd458">
-        <di:waypoint x="580" y="160" />
-        <di:waypoint x="682" y="160" />
+        <di:waypoint x="3740" y="170" />
+        <di:waypoint x="3785" y="170" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1dfgevv_di" bpmnElement="Flow_1dfgevv">
         <di:waypoint x="258" y="160" />
         <di:waypoint x="300" y="160" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_19450wr_di" bpmnElement="Flow_19450wr">
-        <di:waypoint x="1168" y="160" />
-        <di:waypoint x="1230" y="160" />
+        <di:waypoint x="1268" y="160" />
+        <di:waypoint x="1310" y="160" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1gxhao4_di" bpmnElement="Flow_1gxhao4">
         <di:waypoint x="2718" y="160" />
@@ -1041,39 +1019,41 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_051cxlc_di" bpmnElement="Flow_051cxlc">
         <di:waypoint x="3508" y="170" />
-        <di:waypoint x="3570" y="170" />
+        <di:waypoint x="3640" y="170" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0ywr1aj_di" bpmnElement="Flow_0ywr1aj">
         <di:waypoint x="400" y="160" />
         <di:waypoint x="480" y="160" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0f8d0ql_di" bpmnElement="Flow_0f8d0ql">
-        <di:waypoint x="3805" y="170" />
-        <di:waypoint x="3912" y="170" />
+        <di:waypoint x="3835" y="170" />
+        <di:waypoint x="3932" y="170" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="3819" y="152" width="79" height="14" />
+          <dc:Bounds x="3844" y="152" width="79" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_05rchqb_di" bpmnElement="Flow_05rchqb">
-        <di:waypoint x="3808" y="250" />
-        <di:waypoint x="3862" y="250" />
+        <di:waypoint x="3705" y="220" />
+        <di:waypoint x="3832" y="220" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Gateway_1ahpgeg_di" bpmnElement="Gateway_1ahpgeg" isMarkerVisible="true">
-        <dc:Bounds x="3755" y="145" width="50" height="50" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1495vog_di" bpmnElement="ReceiptOfCancellationSent">
-        <dc:Bounds x="3912" y="152" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="3890" y="122" width="83" height="27" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_05wr80k_di" bpmnElement="CheckInsuranceConditions">
-        <dc:Bounds x="3570" y="130" width="100" height="80" />
-      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_08uqlze_di" bpmnElement="Flow_08uqlze">
+        <di:waypoint x="580" y="160" />
+        <di:waypoint x="682" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0j2zge0_di" bpmnElement="Flow_0j2zge0">
+        <di:waypoint x="718" y="160" />
+        <di:waypoint x="805" y="160" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1hergtu_di" bpmnElement="Flow_1hergtu">
+        <di:waypoint x="830" y="135" />
+        <di:waypoint x="830" y="70" />
+        <di:waypoint x="3490" y="70" />
+        <di:waypoint x="3490" y="152" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_05rrp55_di" bpmnElement="InsuranceApproved">
         <dc:Bounds x="3472" y="152" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="3413" y="157" width="49" height="27" />
+          <dc:Bounds x="3412.5" y="156.5" width="49" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0r2tf10_di" bpmnElement="FillInsuranceApplicationForm">
@@ -1086,21 +1066,6 @@
         <dc:Bounds x="222" y="142" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="228" y="185" width="25" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0dy8zbb_di" bpmnElement="InsuranceApplicationIncomplete">
-        <dc:Bounds x="1230" y="120" width="100" height="80" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0jfzr82_di" bpmnElement="InstuctionReceived">
-        <dc:Bounds x="1132" y="142" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1127" y="112" width="48" height="27" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0zn5le4_di" bpmnElement="SendInsuranceApplicationForm">
-        <dc:Bounds x="682" y="142" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="661" y="105" width="78" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1jfd8yu_di" bpmnElement="InsuranceRejected">
@@ -1118,34 +1083,61 @@
           <dc:Bounds x="2940" y="185" width="20" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_14f8gr3_di" bpmnElement="Event_14f8gr3">
-        <dc:Bounds x="1382" y="142" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1390" y="185" width="20" height="14" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_1bc0f5i_di" bpmnElement="Gateway_0zwobbh">
         <dc:Bounds x="805" y="135" width="50" height="50" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0dymaw2_di" bpmnElement="PolicyRemainsValid">
-        <dc:Bounds x="3772" y="232" width="36" height="36" />
+      <bpmndi:BPMNShape id="Event_0zn5le4_di" bpmnElement="SendInsuranceApplicationForm">
+        <dc:Bounds x="682" y="142" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="3704" y="268.5" width="72" height="27" />
+          <dc:Bounds x="611" y="196" width="78" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1bvfohx_di" bpmnElement="EndPolicyConfirmed">
-        <dc:Bounds x="3862" y="232" width="36" height="36" />
+      <bpmndi:BPMNShape id="Event_14f8gr3_di" bpmnElement="Event_14f8gr3">
+        <dc:Bounds x="1452" y="142" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="3870" y="275" width="20" height="14" />
+          <dc:Bounds x="1460" y="185" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0dy8zbb_di" bpmnElement="InsuranceApplicationIncomplete">
+        <dc:Bounds x="1310" y="120" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0jfzr82_di" bpmnElement="InstuctionReceived">
+        <dc:Bounds x="1232" y="142" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1227" y="112" width="48" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_05wr80k_di" bpmnElement="CheckInsuranceConditions">
+        <dc:Bounds x="3640" y="130" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1ahpgeg_di" bpmnElement="Gateway_1ahpgeg" isMarkerVisible="true">
+        <dc:Bounds x="3785" y="145" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1bvfohx_di" bpmnElement="EndPolicyConfirmed">
+        <dc:Bounds x="3832" y="202" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3840" y="245" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1upqiyu_di" bpmnElement="ReceiptOfCancellationSent">
+        <dc:Bounds x="3932" y="152" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3910" y="122" width="83" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0to39r0_di" bpmnElement="PolicyRemainsValid">
+        <dc:Bounds x="3672" y="192" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3594" y="216" width="72" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_0bgutro_di" bpmnElement="Flow_0bgutro">
-        <di:waypoint x="3930" y="188" />
-        <di:waypoint x="3930" y="462" />
+        <di:waypoint x="3950" y="188" />
+        <di:waypoint x="3950" y="462" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1pd5bil_di" bpmnElement="Flow_1pd5bil">
-        <di:waypoint x="1150" y="382" />
-        <di:waypoint x="1150" y="178" />
+        <di:waypoint x="1250" y="382" />
+        <di:waypoint x="1250" y="178" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_07vw05p_di" bpmnElement="Flow_07vw05p">
         <di:waypoint x="700" y="178" />
@@ -1156,11 +1148,11 @@
         <di:waypoint x="2700" y="178" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0wgpejc_di" bpmnElement="Flow_0wgpejc">
-        <di:waypoint x="3790" y="362" />
-        <di:waypoint x="3790" y="268" />
+        <di:waypoint x="3690" y="362" />
+        <di:waypoint x="3690" y="228" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_06qdqho_di" bpmnElement="Flow_06qdqho">
-        <di:waypoint x="3490" y="440" />
+      <bpmndi:BPMNEdge id="Flow_0byzm51_di" bpmnElement="Flow_0byzm51">
+        <di:waypoint x="3490" y="462" />
         <di:waypoint x="3490" y="188" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>

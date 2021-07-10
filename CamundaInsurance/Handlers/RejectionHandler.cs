@@ -27,27 +27,7 @@ namespace CamundaInsurance.Handlers
         }
 
         public async Task<IExecutionResult> HandleAsync(ExternalTask externalTask, CancellationToken cancellationToken)
-        {
-            if(externalTask.Variables.TryGetValue("processId", out var processId))
-            {
-                var message = new CorrelationMessage()
-                {
-                    ProcessInstanceId = processId.AsString(),
-                    MessageName = "Rejection"                    
-                };
-                foreach(var varible in externalTask.Variables)
-                {
-                    message.SetVariable(varible.Key, varible.Value.Value);
-                }
-                try
-                {
-                    var camundaResponce = await camundaClient.Messages.DeliverMessage(message);                    
-                }
-                catch (Exception e)
-                {
-                    return new FailureResult(e.Message);
-                }
-            }            
+        {         
 
             if (!externalTask.Variables.TryGetValue("requestId", out var requestId))
             {
