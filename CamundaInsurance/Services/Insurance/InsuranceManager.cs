@@ -168,6 +168,7 @@ namespace CamundaInsurance.Services.Insurance
             insuranceRequest.Cost = model.Cost;
             insuranceRequest.Reason = model.Reason;
             insuranceRequest.ApprovalDate = DateTime.Now;
+            insuranceRequest.ProcessId = model.ProcessId;
 
             await context.SaveChangesAsync();
 
@@ -195,6 +196,21 @@ namespace CamundaInsurance.Services.Insurance
             if(DateTime.Now.Date - request.ApprovalDate.Date > TimeSpan.FromDays(14))
             {
                 return Error("Insurance can not be revoked after 14 days");
+            }
+
+            var message = new CorrelationMessage()
+            {
+               ProcessInstanceId = request.ProcessId,
+               MessageName = "ReceiptOfCancellation"
+            };
+
+            try
+            {
+                var camundaResponce = await camundaClient.Messages.DeliverMessage(message);
+            }
+            catch(Exception e)
+            {
+                return Error("Service temporarily unavailable", e.Message);
             }
 
             request.Status = InsuranceRequestStatus.Denied;

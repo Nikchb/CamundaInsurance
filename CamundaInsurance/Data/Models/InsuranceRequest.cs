@@ -72,6 +72,8 @@ namespace CamundaInsurance.Data.Models
 
         public string Reason { get; set; }
 
+        public string ProcessId { get; set; }
+
         #endregion        
 
         [Required]

@@ -17,5 +17,7 @@ namespace CamundaInsurance.Services.Insurance.Models
         public decimal Cost { get; set; }
 
         public string Reason { get; set; }
+
+        public string ProcessId { get; set; }
     }
 }

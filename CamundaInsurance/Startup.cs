@@ -59,8 +59,9 @@ namespace CamundaInsurance
                 });
 
             services.AddCamundaWorker("sampleWorker")
-                .AddHandler<InsuranceDenyHandler>()
-                .AddHandler<InsuranceApproveHandler>();
+                .AddHandler<InstructionHandler>()
+                .AddHandler<ApprovalHandler>()
+                .AddHandler<RejectionHandler>();
         }
 
         private void ConfigureDB(IServiceCollection services)
@@ -77,7 +78,7 @@ namespace CamundaInsurance
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ApplicationDbContext context)
         {
-            CamundaStartup.ConfigureCamundaAsync().Wait();  
+            //CamundaStartup.ConfigureCamundaAsync().Wait();  
             
             context.Database.Migrate();
 

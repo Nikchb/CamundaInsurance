@@ -153,20 +153,6 @@
           <text>"EligibleForInsurance"</text>
         </outputEntry>
       </rule>
-      <rule id="DecisionRule_1jldzu6">
-        <inputEntry id="UnaryTests_1re4py2">
-          <text></text>
-        </inputEntry>
-        <inputEntry id="UnaryTests_1upgxgb">
-          <text></text>
-        </inputEntry>
-        <inputEntry id="UnaryTests_1i21ash">
-          <text></text>
-        </inputEntry>
-        <outputEntry id="LiteralExpression_00uos0u">
-          <text></text>
-        </outputEntry>
-      </rule>
     </decisionTable>
   </decision>
   <decision id="DefineHealthHistoryRiskFactor" name="Define health history risk factor">
@@ -686,7 +672,7 @@
   <decision id="CalculateBMI" name="Calculate BMI">
     <variable id="InformationItem_1nekwts" name="bmi" typeRef="long" />
     <literalExpression id="LiteralExpression_0cuejjh" expressionLanguage="feel">
-      <text>decimal(100 * 100 * weight / (height * height), 0) </text>
+      <text>decimal(100 * 100 * weight / (height * height), 0)</text>
     </literalExpression>
   </decision>
   <dmndi:DMNDI>
