@@ -18,10 +18,8 @@ namespace CamundaInsurance.Data.Models
         public string Name { get; set; }
 
         [Required]
-        public string SurName { get; set; }
-        
-        public string InsuranceCardNumber { get; set; }        
-
+        public string SurName { get; set; }      
+            
         [Required]
         public DateTime BirthDay { get; set; }
 

@@ -30,6 +30,7 @@
             <select asp-for="Gender">
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
+                <option value="Other">Other</option>
             </select>
             <span asp-validation-for="Gender" class="text-danger"></span>
         </div>
@@ -57,24 +58,21 @@
         </div>
     </div>
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <div class="form-group">
                     <label asp-for="Email"></label>
                     <input asp-for="Email" class="form-control" />
                     <span asp-validation-for="Email" class="text-danger"></span>
                 </div>
-                <div class="form-group">
-                    <label asp-for="InsuranceCardNumber"></label>
-                    <input asp-for="InsuranceCardNumber" class="form-control" />
-                    <span asp-validation-for="InsuranceCardNumber" class="text-danger"></span>
-                </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <div class="form-group">
                     <label asp-for="Password"></label>
                     <input asp-for="Password" class="form-control" />
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
+            </div>
+            <div class="col-md-4">
                 <div class="form-group">
                     <label asp-for="ConfirmPassword"></label>
                     <input asp-for="ConfirmPassword" class="form-control" />

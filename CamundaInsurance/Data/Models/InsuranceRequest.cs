@@ -24,6 +24,9 @@ namespace CamundaInsurance.Data.Models
         public string Triff { get; set; }
 
         [Required]
+        public bool IsExistingCustomer { get; set; }
+
+        [Required]
         public DateTime InsuranceStartDate { get; set; }
 
         [Required]
@@ -32,7 +35,32 @@ namespace CamundaInsurance.Data.Models
         [Required]
         public short Weight { get; set; }
 
-        public string PreExistingConditions { get; set; }
+        [Required]
+        public bool Disease1RC1 { get; set; }
+
+        [Required]
+        public bool Disease2RC1 { get; set; }
+
+        [Required]
+        public bool Disease3RC1 { get; set; }
+
+        [Required]
+        public bool Disease1RC2 { get; set; }
+
+        [Required]
+        public bool Disease2RC2 { get; set; }
+
+        [Required]
+        public bool Disease3RC2 { get; set; }
+
+        [Required]
+        public bool Disease1RC3 { get; set; }
+
+        [Required]
+        public bool Disease2RC3 { get; set; }
+
+        [Required]
+        public bool Disease3RC3 { get; set; }
 
         #endregion
 
@@ -44,12 +72,7 @@ namespace CamundaInsurance.Data.Models
 
         public string Reason { get; set; }
 
-        #endregion
-
-        #region Calculated
-        [NotMapped]
-        public decimal BMI => Weight / (decimal)Math.Pow(((double)Height) / 100, 2);
-        #endregion
+        #endregion        
 
         [Required]
         public string UserId { get; set; }

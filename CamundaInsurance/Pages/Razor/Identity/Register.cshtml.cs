@@ -71,14 +71,6 @@ namespace CamundaInsurance.Pages.Razor.Identity
         [BindProperty]
         public DateTime BirthDay { get; set; }
 
-        [DataType(DataType.Text)]
-        [Display(Name = "Insutance Card Number")]
-        [MinLength(8)]
-        [MaxLength(8)]
-        [RegularExpression("^[0-9]*$")]
-        [BindProperty]
-        public string InsuranceCardNumber { get; set; }
-
         [Required]
         [DataType(DataType.Text)]
         [Display(Name = "Post Index")]
@@ -116,8 +108,7 @@ namespace CamundaInsurance.Pages.Razor.Identity
             {
                 var user = new User { 
                     UserName = Email,                    
-                    BirthDay = BirthDay,
-                    InsuranceCardNumber = InsuranceCardNumber,
+                    BirthDay = BirthDay,                    
                     Name = Name,
                     SurName = Surname,
                     Gender = Gender,

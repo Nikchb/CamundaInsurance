@@ -88,14 +88,24 @@ namespace CamundaInsurance.Services.Insurance
                 return Error("Insurance request is already in process, please wait for the result");
             }
 
-            var insuranceRequest = new InsuranceRequest 
+            // it will be better to use mapper...
+            var insuranceRequest = new InsuranceRequest
             {
                 Status = InsuranceRequestStatus.InProcess,
                 Triff = model.Tariff,
+                IsExistingCustomer = model.IsExistingCustomer,
                 InsuranceStartDate = model.InsuranceStartDate,
                 Height = model.Height,
                 Weight = model.Weight,
-                PreExistingConditions = model.PreExistingConditions,
+                Disease1RC1 = model.Disease1RC1,
+                Disease1RC2 = model.Disease1RC2,
+                Disease1RC3 = model.Disease1RC3,
+                Disease2RC1 = model.Disease2RC1,
+                Disease2RC2 = model.Disease2RC2,
+                Disease2RC3 = model.Disease2RC3,
+                Disease3RC1 = model.Disease3RC1,
+                Disease3RC2 = model.Disease3RC2,
+                Disease3RC3 = model.Disease3RC3,
                 UserId = user.Id
             };
 
@@ -116,8 +126,16 @@ namespace CamundaInsurance.Services.Insurance
                 .Set("insuranceStartDate", insuranceRequest.InsuranceStartDate)
                 .Set("height", insuranceRequest.Height)
                 .Set("weight", insuranceRequest.Weight)
-                .Set("preExistingConditions", insuranceRequest.PreExistingConditions)
-                .Set("isExistingCustomer", !string.IsNullOrWhiteSpace(user.InsuranceCardNumber));
+                .Set("disease1RC1", insuranceRequest.Disease1RC1)
+                .Set("disease2RC1", insuranceRequest.Disease2RC1)
+                .Set("disease3RC1", insuranceRequest.Disease3RC1)
+                .Set("disease1RC2", insuranceRequest.Disease1RC2)
+                .Set("disease2RC2", insuranceRequest.Disease2RC2)
+                .Set("disease3RC2", insuranceRequest.Disease3RC2)
+                .Set("disease1RC3", insuranceRequest.Disease1RC3)
+                .Set("disease2RC3", insuranceRequest.Disease2RC3)
+                .Set("disease3RC3", insuranceRequest.Disease3RC3)
+                .Set("isExistingCustomer", insuranceRequest.IsExistingCustomer);
             try
             {
                 var camundaResponce = await camundaClient.Messages.DeliverMessage(message);
