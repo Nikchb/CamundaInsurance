@@ -33,7 +33,7 @@
             {
                 <div class="form-group col-md-4">
                     <label>Insurance can be deactivated till @Info.DeactivationDeadline.ToString("dd.MM.yyyy")</label>
-                    <NavLink href="/card/revoke">Deactivate Incurance</NavLink>
+                    <button @onclick="RevokeInsurance" class="form-control btn-danger">Deactivate Insurance</button>                   
                 </div>
             }
         }
@@ -70,7 +70,8 @@
         @if (Info.Status == InsuranceRequestStatus.Denied || Info.Status == InsuranceRequestStatus.None)
         {
             <div class="col-md-4">
-                <NavLink href="/card/new-request">Request Insurance</NavLink>
+                <label>Just push the button below to request insurance!</label>
+                <button @onclick="RequestInsurance" class="form-control btn-success" >Request Insurance</button>           
             </div>
         }
     </div>

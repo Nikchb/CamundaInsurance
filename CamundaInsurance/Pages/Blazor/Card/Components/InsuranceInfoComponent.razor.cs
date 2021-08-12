@@ -15,6 +15,9 @@ namespace CamundaInsurance.Pages.Blazor.Card.Components
         [Inject]
         private InsuranceManager InsuranceManager { get; set; }
 
+        [Inject]
+        protected NavigationManager NavigationManager { get; set; }
+
         private InsuranceInfoModel Info { get; set; }
 
         protected async override Task OnParametersSetAsync()
@@ -25,6 +28,16 @@ namespace CamundaInsurance.Pages.Blazor.Card.Components
                 Info = responce.Content;
             }            
             await  base.OnParametersSetAsync();
+        }
+
+        private void RequestInsurance()
+        {
+            NavigationManager.NavigateTo("/card/new-request");
+        }
+
+        private void RevokeInsurance()
+        {
+            NavigationManager.NavigateTo("/card/revoke");
         }
     }
 }
