@@ -1,0 +1,53 @@
+version: '3'
+
+services:  
+    webapp:
+        image: ${DOCKER_REGISTRY-}webapp
+        build:
+            context: .
+            dockerfile: CamundaInsurance/Dockerfile
+        environment:
+            - ASPNETCORE_ENVIRONMENT=Development
+            - DB_HOST=postgres
+            - DB_PORT=5432
+            - DB_USERNAME=camunda
+            - DB_PASSWORD=camunda
+            - CAMUNDA_URL=camunda:8080
+        volumes:
+            - ./BusinessProcesses:/app/BusinessProcesses/
+        ports:
+            - "5020:80"
+        restart: always
+    camunda:
+        image: camunda/camunda-bpm-platform:run-latest
+        environment:
+            - DB_DRIVER=org.postgresql.Driver
+            - DB_URL=jdbc:postgresql://postgres:5432/camunda
+            - DB_USERNAME=camunda
+            - DB_PASSWORD=camunda
+            - WAIT_FOR=postgres:5432
+            - CAMUNDA_BPM_AUTHORIZATION_ENABLED=true
+            - CAMUNDA_BPM_HISTORY-LEVEL=NONE
+        links:
+            - postgres
+        ports:
+            - "8080:8080"
+        restart: unless-stopped   
+    postgres:
+        image: postgres:latest
+        environment:
+            - POSTGRES_USER=camunda
+            - POSTGRES_PASSWORD=camunda
+        volumes:
+            - ./data:/var/lib/postgresql/data/  
+        ports:
+            - "5432:5432"
+    adminer:
+        image: adminer
+        restart: always
+        ports:
+            - 8090:8080    
+networks:
+    default:
+        driver: bridge
+    

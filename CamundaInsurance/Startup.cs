@@ -1,5 +1,12 @@
-using CamundaInsurance.Areas.Identity;
+using Camunda.Api.Client;
+using Camunda.Worker;
+using Camunda.Worker.Client;
 using CamundaInsurance.Data;
+using CamundaInsurance.Data.Models;
+using CamundaInsurance.Handlers;
+using CamundaInsurance.Services;
+
+using CamundaInsurance.Services.Insurance;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -31,21 +38,53 @@ namespace CamundaInsurance
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            CamundaStartup.WaitForCamundaAsync().Wait();
+
+            ConfigureDB(services);
+
+            services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
+            services.AddTransient<IdentityService>();
+            services.AddTransient<InsuranceManager>();
+            services.AddTransient(v => CamundaClient.Create($"http://{Environment.GetEnvironmentVariable("CAMUNDA_URL") ?? "localhost:8080"}/engine-rest"));
+            
             services.AddDatabaseDeveloperPageExceptionFilter();
-            services.AddSingleton<WeatherForecastService>();
+
+            services.AddExternalTaskClient()
+                .ConfigureHttpClient((provider, client) =>
+                {
+                    client.BaseAddress = new Uri($"http://{Environment.GetEnvironmentVariable("CAMUNDA_URL") ?? "localhost:8080"}/engine-rest");
+                });
+
+            services.AddCamundaWorker("sampleWorker")
+                .AddHandler<InstructionHandler>()
+                .AddHandler<ApprovalHandler>()
+                .AddHandler<RejectionHandler>();
+        }
+
+        private void ConfigureDB(IServiceCollection services)
+        {
+            var host = Environment.GetEnvironmentVariable("DB_HOST") ?? "localhost";
+            var port = Environment.GetEnvironmentVariable("DB_PORT") ?? "5432";
+            var user = Environment.GetEnvironmentVariable("DB_USERNAME") ?? "camunda";
+            var password = Environment.GetEnvironmentVariable("DB_PASSWORD") ?? "camunda";                    
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseNpgsql($"Host={host};Port={port};Database=webapp;Username={user};Password={password}"),
+                ServiceLifetime.Transient);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ApplicationDbContext context)
         {
+            if (env.IsProduction())
+            {
+                CamundaStartup.ConfigureCamundaAsync().Wait();
+            }
+            
+            context.Database.Migrate();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -58,7 +97,6 @@ namespace CamundaInsurance
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
@@ -70,7 +108,7 @@ namespace CamundaInsurance
             {
                 endpoints.MapControllers();
                 endpoints.MapBlazorHub();
-                endpoints.MapFallbackToPage("/_Host");
+                endpoints.MapFallbackToPage("/Blazor/Shared/_Host");
             });
         }
     }

@@ -1,0 +1,100 @@
+﻿@page "/card/new-request"
+
+<h3>New Insurance Request</h3>
+
+<ul class="alert-danger">
+    @foreach (var error in Errors)
+    {
+        <li>@error</li>
+    }
+</ul>
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label>Insurance Type</label>
+            <select class="form-control" @bind="Model.Tariff">
+                <option value="Basic">Basic</option>
+                <option value="Premium">Premium</option>
+            </select>
+        </div>        
+        <div class="form-group">
+            <label>Insurance Start Date</label>
+            <input class="form-control" type="date" @bind="Model.InsuranceStartDate" />
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label>Height</label>
+            <input class="form-control" type="number" @bind="Model.Height" />
+        </div>
+        <div class="form-group">
+            <label>Weight</label>
+            <input class="form-control" type="number" @bind="Model.Weight" />
+        </div>
+    </div>
+</div>
+<div class="form-check">
+    <input class="form-check-input" type="checkbox" @bind="Model.IsExistingCustomer" />
+    <label class="form-check-label">Existing Customer</label>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <div class="form-check">            
+            <input class="form-check-input" type="checkbox" @bind="Model.Disease1RC1" />
+            <label class="form-check-label">Do you have chronical bronchitis?</label>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" @bind="Model.Disease2RC1" />            
+            <label class="form-check-label">Do you have dermatitis?</label>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" @bind="Model.Disease3RC1" />
+            <label class="form-check-label">Do you have allergy?</label>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" @bind="Model.Disease1RC2" />            
+            <label class="form-check-label">Do you have asthma?</label>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" @bind="Model.Disease2RC2" />            
+            <label class="form-check-label">Do you have migraine?</label>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" @bind="Model.Disease3RC2" />            
+            <label class="form-check-label">Do you have scoliosis?</label>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" @bind="Model.Disease1RC3" />           
+            <label class="form-check-label">Do you have any type of cancer?</label>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-check">            
+            <input class="form-check-input" type="checkbox" @bind="Model.Disease2RC3" />
+            <label class="form-check-label">Do you have heart problems?</label>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-check">            
+            <input class="form-check-input" type="checkbox" @bind="Model.Disease3RC3" />
+            <label class="form-check-label">Have you ever had a stroke?</label>
+        </div>
+    </div>
+</div>
+<button @onclick="SendRequest" class="form-control btn-primary">Send Insurance Request</button>
