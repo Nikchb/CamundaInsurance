@@ -7,7 +7,7 @@ services:
             context: .
             dockerfile: CamundaInsurance/Dockerfile
         environment:
-            - ASPNETCORE_ENVIRONMENT=Development
+            - ASPNETCORE_ENVIRONMENT=Production
             - DB_HOST=postgres
             - DB_PORT=5432
             - DB_USERNAME=camunda
