@@ -1,6 +1,6 @@
 version: '3'
 
-services:  
+services:
     webapp:
         image: ${DOCKER_REGISTRY-}webapp
         build:
@@ -19,7 +19,7 @@ services:
             - "5020:80"
         restart: always
     camunda:
-        image: camunda/camunda-bpm-platform:run-latest
+        image: camunda/camunda-bpm-platform:run-7.14.0
         environment:
             - DB_DRIVER=org.postgresql.Driver
             - DB_URL=jdbc:postgresql://postgres:5432/camunda
@@ -32,19 +32,27 @@ services:
             - postgres
         ports:
             - "8080:8080"
-        restart: unless-stopped   
+        restart: unless-stopped
     postgres:
-        image: postgres:latest
+        image: postgres:13.3
         environment:
             - POSTGRES_USER=camunda
             - POSTGRES_PASSWORD=camunda
         volumes:
-            - database:/var/lib/postgresql/data/  
+            - database:/var/lib/postgresql/data/
         ports:
-            - "5432:5432"  
+            - "5432:5432"
+
+    adminer:
+        image: adminer:latest
+        environment:
+            ADMINER_DEFAULT_SERVER: postgres
+        ports:
+            - 8081:8080
+        restart: unless-stopped
 networks:
     default:
         driver: bridge
 
 volumes:
-  database:   
+    database:
